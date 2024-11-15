@@ -67,8 +67,11 @@
                                     <td>{{item.cirugias_previas}}</td>
                                    
                                     <td>
-                                        <span class="patient-status status-active"></span>
-                                        Activo
+                                        {% if item.activo %}
+                                            <span class="badge bg-success">Activo</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Inactivo</span>
+                                        {% endif %}
                                     </td>
                                     <td>
                                         <div class="action-buttons d-flex gap-2">

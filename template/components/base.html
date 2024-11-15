@@ -32,20 +32,24 @@
                 <a class="nav-link" href="{% url 'attention:attention_list' %}"><i class="fas fa-procedures me-2"></i>Ficha Clinica</a>
                 <a class="nav-link" href="#"><i class="fas fa-stethoscope me-2"></i>Pagos</a>
                 <a class="nav-link" href="#"><i class="fas fa-stethoscope me-2"></i>Examenes</a>
-                <a class="text-white ms-2 text-decoration-none " href="#"><i></i> Mantenimiento</a>
-                <a class="nav-link" href="#"><i class="fas fa-cogs me-2"></i> Especialidad</a>
-                <a class="nav-link" href="#"><i class="fas fa-cogs me-2"></i> Doctor</a>
-                <a class="nav-link" href="#"><i class="fas fa-cogs me-2"></i> Horarios</a>
-                <a class="nav-link" href="#"><i class="fas fa-cogs me-2"></i> Servicios</a>
-                <a class="nav-link" href="#"><i class="fas fa-cogs me-2"></i> Costos</a>
-                <a class="nav-link" href="#"><i class="fas fa-cogs me-2"></i> Cargo</a>
-                <a class="nav-link" href="#"><i class="fas fa-cogs me-2"></i> Certificados</a>
-                <a class="nav-link" href="#"><i class="fas fa-cogs me-2"></i> Empleado</a>
-                <a class="nav-link" href="#"><i class="fas fa-cogs me-2"></i>Tipo Medicina</a>
-                <a class="nav-link" href="#"><i class="fas fa-cogs me-2"></i>Marca Medicina </a>
-                <a class="nav-link" href="#"><i class="fas fa-cogs me-2"></i> Medicamento</a>
-                <a class="nav-link" href="#"><i class="fas fa-cogs me-2"></i> Diagnostico</a>
-                <a class="nav-link" href="#"><i class="fas fa-cogs me-2"></i> Tipo Sangre</a>
+                <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#mantenimientoSubmenu" aria-expanded="false" aria-controls="mantenimientoSubmenu">
+                    <i class="fas fa-tools me-2"></i> Mantenimiento
+                </a>
+                <div class="collapse" id="mantenimientoSubmenu">
+                    <a class="nav-link" href="#"><i class="fas fa-cogs me-2"></i> Especialidad</a>
+                    <a class="nav-link" href="#"><i class="fas fa-cogs me-2"></i> Doctor</a>
+                    <a class="nav-link" href="#"><i class="fas fa-cogs me-2"></i> Horarios</a>
+                    <a class="nav-link" href="#"><i class="fas fa-cogs me-2"></i> Servicios</a>
+                    <a class="nav-link" href="#"><i class="fas fa-cogs me-2"></i> Costos</a>
+                    <a class="nav-link" href="#"><i class="fas fa-briefcase me-2"></i> Cargo </a>
+                    <a class="nav-link" href="#"><i class="fas fa-cogs me-2"></i> Certificados</a>
+                    <a class="nav-link" href="#"><i class="fas fa-cogs me-2"></i> Empleado</a>
+                    <a class="nav-link" href="#"><i class="fas fa-cogs me-2"></i> Tipo Medicina</a>
+                    <a class="nav-link" href="#"><i class="fas fa-cogs me-2"></i> Marca Medicina</a>
+                    <a class="nav-link" href="#"><i class="fas fa-cogs me-2"></i> Medicamento</a>
+                    <a class="nav-link" href="#"><i class="fas fa-cogs me-2"></i> Diagnostico</a>
+                    <a class="nav-link" href="{% url 'core:tipoSangre_list' %}"><i class="fas fa-tint me-2"></i> Tipo Sangre </a>
+                </div>
                
                             
             </nav>

@@ -13,9 +13,9 @@ class PatientForm(ModelForm):
      
         # Mensajes de error personalizados para ciertos campos
         error_messages = {
-            # "cedula": {
-            #     "unique": "Ya existe un paciente con esta cedula",
-            # },
+            "cedula": {
+                "unique": "Ya existe un paciente con esta cedula",
+            },
             "email": {
                 "unique": "Ya existe un paiente con este email.",
             },
