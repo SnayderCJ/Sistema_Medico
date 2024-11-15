@@ -87,8 +87,6 @@ class Paciente(models.Model):
         verbose_name = "Paciente"
         verbose_name_plural = "Pacientes"
     
-    
-    
     @property
     def nombre_completo(self):
         return f"{self.apellidos} {self.nombres}"
@@ -314,6 +312,8 @@ class Medicamento(models.Model):
     cantidad = models.PositiveIntegerField(verbose_name="Stock")
     # Precio del medicamento
     precio = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Precio")
+    # Imagen del Medicamento
+    foto = models.ImageField(upload_to='medicamentos/', verbose_name="Foto del Medicamento", null=True, blank=True)
     # Campo que indica si el medicamento es genérico o comercial
     comercial = models.BooleanField(default=True,
         verbose_name="Comercial"
@@ -327,6 +327,12 @@ class Medicamento(models.Model):
     def __str__(self):
         return f"{self.nombre} - ({self.tipo})"
     
+    def get_image(self):
+        if self.foto:
+            return self.foto.url
+        else:
+            return '/static/img/medicamento.png'
+        
     class Meta:
         # Ordena los medicamentos alfabéticamente por nombre
         ordering = ['nombre']

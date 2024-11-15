@@ -7,7 +7,12 @@ from aplication.core.views.especialidad import EspecialidadListView, Especialida
 from aplication.core.views.cargo import CargoListView, CargoCreateView, CargoUpdateView, CargoDeleteView, CargoDetailView
 from aplication.core.views.empleado import EmpleadoListView, EmpleadoCreateView, EmpleadoUpdateView, EmpleadoDeleteView, EmpleadoDetailView
 from aplication.core.views.tipoMedicamento import TipoMedicamentoListView, TipoMedicamentoCreateView, TipoMedicamentoUpdateView, TipoMedicamentoDeleteView, TipoMedicamentoDetailView
-# from aplication.core.views.medicamento import MedicamentoListView, MedicamentoCreateView, MedicamentoUpdateView, MedicamentoDeleteView, MedicamentoDetailView 
+from aplication.core.views.marcaMedicamento import MarcaMedicamentoListView, MarcaMedicamentoCreateView, MarcaMedicamentoUpdateView, MarcaMedicamentoDeleteView
+from aplication.core.views.medicamento import MedicamentoListView, MedicamentoCreateView, MedicamentoUpdateView, MedicamentoDeleteView, MedicamentoDetailView 
+from aplication.core.views.diagnostico import DiagnosticoListView, DiagnosticoCreateView, DiagnosticoUpdateView, DiagnosticoDeleteView, DiagnosticoDetailView
+# from aplication.core.views.categoriaExamen import CategoriaExamenListView, CategoriaExamenCreateView, CategoriaExamenUpdateView, CategoriaExamenDeleteView, CategoriaExamenDetailView
+ 
+ 
  
 app_name='core' # define un espacio de nombre para la aplicacion
 urlpatterns = [
@@ -65,10 +70,31 @@ urlpatterns = [
   path('tipoMedicamento_delete/<int:pk>/', TipoMedicamentoDeleteView.as_view(), name="tipoMedicamento_delete"),
   path('tipoMedicamento_detail/<int:pk>/', TipoMedicamentoDetailView.as_view(), name="tipoMedicamento_detail"),
   
+  # Marca de Medicamento
+  path('marcaMedicamento_list/', MarcaMedicamentoListView.as_view(), name="marcaMedicamento_list"),
+  path('marcaMedicamento_create/', MarcaMedicamentoCreateView.as_view(), name="marcaMedicamento_create"),
+  path('marcaMedicamento_update/<int:pk>/', MarcaMedicamentoUpdateView.as_view(), name="marcaMedicamento_update"),
+  path('marcaMedicamento_delete/<int:pk>/', MarcaMedicamentoDeleteView.as_view(), name="marcaMedicamento_delete"),
+  
   # Medicamento 
-  # path('medicamento_list/', MedicamentoListView.as_view(), name="medicamento_list"),
-  # path('medicamento_create/', MedicamentoCreateView.as_view(), name="medicamento_create"),
-  # path('medicamento_update/<int:pk>/', MedicamentoUpdateView.as_view(), name="medicamento_update"),
-  # path('medicamento_delete/<int:pk>/', MedicamentoDeleteView.as_view(), name="medicamento_delete"),
-  # path('medicamento_detail/<int:pk>/', MedicamentoDetailView.as_view(), name="medicamento_detail"),
+  path('medicamento_list/', MedicamentoListView.as_view(), name="medicamento_list"),
+  path('medicamento_create/', MedicamentoCreateView.as_view(), name="medicamento_create"),
+  path('medicamento_update/<int:pk>/', MedicamentoUpdateView.as_view(), name="medicamento_update"),
+  path('medicamento_delete/<int:pk>/', MedicamentoDeleteView.as_view(), name="medicamento_delete"),
+  path('medicamento_detail/<int:pk>/', MedicamentoDetailView.as_view(), name="medicamento_detail"),
+  
+  # Diagnostico
+  path('diagnostico_list/', DiagnosticoListView.as_view(), name="diagnostico_list"),
+  path('diagnostico_create/', DiagnosticoCreateView.as_view(), name="diagnostico_create"),
+  path('diagnostico_update/<int:pk>/', DiagnosticoUpdateView.as_view(), name="diagnostico_update"),
+  path('diagnostico_delete/<int:pk>/', DiagnosticoDeleteView.as_view(), name="diagnostico_delete"),
+  path('diagnostico_detail/<int:pk>/', DiagnosticoDetailView.as_view(), name="diagnostico_detail"),
+  
+  # CategoriaExamen
+  # path('categoriaExamen_list/', CategoriaExamenListView.as_view(), name="categoriaExamen_list"),
+  # path('categoriaExamen_create/', CategoriaExamenCreateView.as_view(), name="categoriaExamen_create"),
+  # path('categoriaExamen_update/<int:pk>/', CategoriaExamenUpdateView.as_view(), name="categoriaExamen_update"),
+  # path('categoriaExamen_delete/<int:pk>/', CategoriaExamenDeleteView.as_view(), name="categoriaExamen_delete"),
+  # path('categoriaExamen_detail/<int:pk>/', CategoriaExamenDetailView.as_view(), name="categoriaExamen_detail"),
+  
 ]
