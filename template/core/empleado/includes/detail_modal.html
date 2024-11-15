@@ -1,0 +1,46 @@
+<!-- templates/includes/empleado_detail_modal.html -->
+<div class="modal fade" id="empleadoModal" tabindex="-1" aria-labelledby="empleadoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary bg-opacity-75">
+                <h5 class="modal-title text-white fw-bold" id="empleadoModalLabel">
+                    <i class="fas fa-user-circle me-2"></i>Detalles del Empleado
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <!-- Columna para la foto -->
+                    <div class="col-md-4 text-center mb-3">
+                        <img id="empleado-foto" src="" alt="Foto del empleado" 
+                             class="img-fluid rounded shadow-sm" 
+                             style="max-height: 200px; width: auto;">
+                    </div>
+                    <!-- Columna para los datos -->
+                    <div class="col-md-8">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong><i class="fas fa-id-card me-2"></i>ID:</strong> <span id="empleado-id"></span></p>
+                                <p><strong><i class="fas fa-user me-2"></i>Nombres:</strong> <span id="empleado-nombres"></span></p>
+                                <p><strong><i class="fas fa-user me-2"></i>Apellidos:</strong> <span id="empleado-apellidos"></span></p>
+                                <p><strong><i class="fa-solid fa-calendar me-2"></i>F. Nacimiento:</strong> <span id="empleado-nac"></span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong><i class="fas fa-address-card me-2"></i>DNI:</strong> <span id="empleado-dni"></span></p>
+                                <p><strong><i class="fas fa-map-marker-alt me-2"></i>Dirección:</strong> <span id="empleado-direccion"></span></p>
+                                <p><strong><i class="fas fa-briefcase me-2"></i>Cargo:</strong> <span id="empleado-cargo"></span></p>
+                                <p><strong><i class="fas fa-dollar-sign me-2"></i>Sueldo:</strong> <span id="empleado-sueldo"></span></p>
+                                <p><strong><i class="fas fa-birthday-cake me-2"></i>Edad:</strong> <span id="empleado-edad"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -5,7 +5,7 @@ from aplication.core.views.tipoSangre import TipoSangreListView, TipoSangreCreat
 from aplication.core.views.especialidad import EspecialidadListView, EspecialidadCreateView, EspecialidadUpdateView, EspecialidadDeleteView, EspecialidadDetailView
 # from aplication.core.views.doctor import DoctorListView, DoctorCreateView # Seguir con las rutas de doctor
 from aplication.core.views.cargo import CargoListView, CargoCreateView, CargoUpdateView, CargoDeleteView, CargoDetailView
-# from aplication.core.views.empleado import EmpleadoListView, EmpleadoCreateView, EmpleadoUpdateView, EmpleadoDeleteView, EmpleadoDetailView
+from aplication.core.views.empleado import EmpleadoListView, EmpleadoCreateView, EmpleadoUpdateView, EmpleadoDeleteView, EmpleadoDetailView
 # from aplication.core.views.tipoMedicamento import TipoMedicamentoListView, TipoMedicamentoCreateView, TipoMedicamentoUpdateView, TipoMedicamentoDeleteView, TipoMedicamentoDetailView
 # from aplication.core.views.medicamento import MedicamentoListView, MedicamentoCreateView, MedicamentoUpdateView, MedicamentoDeleteView, MedicamentoDetailView 
  
@@ -52,11 +52,11 @@ urlpatterns = [
   path('cargo_detail/<int:pk>/', CargoDetailView.as_view(), name="cargo_detail"),
   
   # Empleado 
-  # path('empleado_list/', EmpleadoListView.as_view(), name="empleado_list"),
-  # path('empleado_create/', EmpleadoCreateView.as_view(), name="empleado_create"),
-  # path('empleado_update/<int:pk>/', EmpleadoUpdateView.as_view(), name="empleado_update"),
-  # path('empleado_delete/<int:pk>/', EmpleadoDeleteView.as_view(), name="empleado_delete"),
-  # path('empleado_detail/<int:pk>/', EmpleadoDetailView.as_view(), name="empleado_detail"),
+  path('empleado_list/', EmpleadoListView.as_view(), name="empleado_list"),
+  path('empleado_create/', EmpleadoCreateView.as_view(), name="empleado_create"),
+  path('empleado_update/<int:pk>/', EmpleadoUpdateView.as_view(), name="empleado_update"),
+  path('empleado_delete/<int:pk>/', EmpleadoDeleteView.as_view(), name="empleado_delete"),
+  path('empleado_detail/<int:pk>/', EmpleadoDetailView.as_view(), name="empleado_detail"),
   
   # Tipo de Medicamento
   # path('tipoMedicamento_list/', TipoMedicamentoListView.as_view(), name="tipoMedicamento_list"),

@@ -237,6 +237,20 @@ class Empleado(models.Model):
     def __str__(self):
         return f"{self.apellidos}"
     
+    def get_image(self):
+        if self.foto:
+            return self.foto.url
+        else:
+            return '/static/img/usuario_anonimo.png'
+    
+    @staticmethod
+    def calcular_edad(fecha_nacimiento):
+        today = date.today()  # Obtener la fecha actual
+        edad = today.year - fecha_nacimiento.year  # Calcular la diferencia de años
+        # Ajustar la edad si el cumpleaños de este año no ha ocurrido aún
+        if (today.month, today.day) < (fecha_nacimiento.month, fecha_nacimiento.day):
+            edad -= 1  # Restar un año si el cumpleaños no ha pasado
+        return edad  
     
     class Meta:
         # Ordena los empleados alfabéticamente por apellido y nombre
