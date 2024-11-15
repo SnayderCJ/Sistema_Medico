@@ -4,7 +4,7 @@ from aplication.core.views.patient import PatientCreateView, PatientDeleteView, 
 from aplication.core.views.tipoSangre import TipoSangreListView, TipoSangreCreateView, TipoSangreUpdateView, TipoSangreDeleteView, TipoSangreDetailView
 from aplication.core.views.especialidad import EspecialidadListView, EspecialidadCreateView, EspecialidadUpdateView, EspecialidadDeleteView, EspecialidadDetailView
 # from aplication.core.views.doctor import DoctorListView, DoctorCreateView # Seguir con las rutas de doctor
-# from aplication.core.views.cargo import CargoListView, CargoCreateView, CargoUpdateView, CargoDeleteView, CargoDetailView
+from aplication.core.views.cargo import CargoListView, CargoCreateView, CargoUpdateView, CargoDeleteView, CargoDetailView
 # from aplication.core.views.empleado import EmpleadoListView, EmpleadoCreateView, EmpleadoUpdateView, EmpleadoDeleteView, EmpleadoDetailView
 # from aplication.core.views.tipoMedicamento import TipoMedicamentoListView, TipoMedicamentoCreateView, TipoMedicamentoUpdateView, TipoMedicamentoDeleteView, TipoMedicamentoDetailView
 # from aplication.core.views.medicamento import MedicamentoListView, MedicamentoCreateView, MedicamentoUpdateView, MedicamentoDeleteView, MedicamentoDetailView 
@@ -45,11 +45,11 @@ urlpatterns = [
   # Seguir con las rutas de doctor
   
   # Cargo 
-  # path('cargo_list/', CargoListView.as_view(), name="cargo_list"),
-  # path('cargo_create/', CargoCreateView.as_view(), name="cargo_create"),
-  # path('cargo_update/<int:pk>/', CargoUpdateView.as_view(), name="cargo_update"),
-  # path('cargo_delete/<int:pk>/', CargoDeleteView.as_view(), name="cargo_delete"),
-  # path('cargo_detail/<int:pk>/', CargoDetailView.as_view(), name="cargo_detail"),
+  path('cargo_list/', CargoListView.as_view(), name="cargo_list"),
+  path('cargo_create/', CargoCreateView.as_view(), name="cargo_create"),
+  path('cargo_update/<int:pk>/', CargoUpdateView.as_view(), name="cargo_update"),
+  path('cargo_delete/<int:pk>/', CargoDeleteView.as_view(), name="cargo_delete"),
+  path('cargo_detail/<int:pk>/', CargoDetailView.as_view(), name="cargo_detail"),
   
   # Empleado 
   # path('empleado_list/', EmpleadoListView.as_view(), name="empleado_list"),
