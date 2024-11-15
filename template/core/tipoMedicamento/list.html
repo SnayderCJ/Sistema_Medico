@@ -1,0 +1,170 @@
+{% extends 'components/base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+<div class="row">
+
+    <!-- TipoMedicamento List Content -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="card-title mb-0">Lista de Tipos de Medicamentos</h5>
+            </div>
+
+            <!-- Search and Filter -->
+            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between g-3 mb-4">
+            <form method="GET" action="{% url 'core:tipoMedicamento_list' %}" class="d-flex flex-column flex-md-row gap-3 align-items-md-center">
+                <div class="col-md-6">
+                    <input type="text" name="q" class="form-control search-box" value="{{ request.GET.q }}" placeholder="Buscar Tipo de Medicamento...">
+                </div>
+                <div class="col-md-6">
+                    <select class="form-select" name="status" onchange="this.form.submit()">
+                        <option value="">Todos</option>
+                        <option value="activo" {% if request.GET.status == "activo" %}selected{% endif %}>Activos</option>
+                        <option value="inactivo" {% if request.GET.status == "inactivo" %}selected{% endif %}>Inactivos</option>
+                    </select>
+                </div>
+                </form>
+                <a class="btn btn-primary mt-3 mt-md-0" href="{% url 'core:tipoMedicamento_create' %}">
+                        <i class="fas fa-plus me-2"></i>Nuevo Tipo de Medicamento
+                </a>
+            </div>
+
+            <!-- TipoMedicamento Table -->
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Descripcion</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in tipo_medicamentos %} 
+                        
+                        <tr>
+                            <td>{{item.nombre}}</td>
+                            <td>{{item.descripcion}}</td>
+
+                            <td>
+                                {% if item.activo %}
+                                    <span class="badge bg-success">Activo</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Inactivo</span>
+                                {% endif %}
+
+                            
+                            <td>
+                                <div class="action-buttons d-flex gap-2">
+                                    <button class="btn btn-info btn-sm" title="Detalle Tipo de Medicamento"
+                                        onclick="verTipoMedicamento('{{ item.id }}')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <a href="{% url 'core:tipoMedicamento_update' item.id %}" class="btn btn-info btn-sm text-white" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    {% with id=item.id name=item.nombre msg="Esta seguro de eliminar el tipo de medicamento:" %}
+                                        <button class="btn btn-danger" onclick="confirmDelete('{{ id }}','{{name}}','{{ msg|escapejs }}');"> <i class="fa-solid fa-trash"></i></button>
+                                    {% endwith %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %} 
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <nav class="d-flex justify-content-between align-items-center mt-4">
+                <p class="text-muted mb-0">{{ page_obj.start_index }} - {{ page_obj.end_index }} de {{ page_obj.paginator.count }} tipos de medicamentos</p>
+                <ul class="pagination mb-0">
+                    {% if page_obj.has_previous %} 
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1"><i class="fas fa-chevron-left"></i></a>
+                        </li>
+                    {% endif %}
+                    {% for num in page_obj.paginator.page_range %}
+                        <li class="page-item active"><a class="page-link" href="?page={{ num }}">{{num}}</a></li>
+                    
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}"><i class="fas fa-chevron-right"></i></a>
+                        </li>
+                        {% endif %}
+                </ul>
+            </nav>
+            <!-- Fin de Pagination -->
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- llama al modal generico de eliminacion -->
+{% include 'includes/confirm_delete_modal.html' %}
+<!-- llama al modal de mostrar datos del detalle del tipo de medicamento -->
+{% include 'core/tipoMedicamento/includes/detail_modal.html' %}
+
+{% endblock %}
+
+{% block js %}
+<script>
+/* funciones del modal eliminar*/
+function confirmDelete(id,name,msg) {
+    // Actualiza el mensaje del modal
+    const modalMessage = document.getElementById('modalMessage');
+    if (modalMessage) {
+        modalMessage.innerText = `${msg} ${name}`;
+    }
+
+    // Actualiza la acción del formulario
+    const form = document.getElementById('deleteForm');
+    if (form) {
+        form.action = `/tipoMedicamento_delete/${id}/`; 
+    }
+
+    // Muestra el modal
+    const modalElement = document.getElementById('confirmDeleteModal');
+    if (modalElement) {
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+    }
+}
+
+function closeModal() {
+    const modalElement = document.getElementById('confirmDeleteModal');
+    if (modalElement) {
+        const modalInstance = bootstrap.Modal.getInstance(modalElement);
+        if (modalInstance) {
+            modalInstance.hide();
+        }
+    }
+}
+
+/* funciones del modal detalle */
+function verTipoMedicamento(id) {
+    fetch('/tipoMedicamento_detail/' + id + '/')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error en la respuesta del servidor');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Llenar el modal con los datos
+            document.getElementById('tipoMedicamento-id').textContent = data.id;
+            document.getElementById('tipoMedicamento-nombre').textContent = data.nombre;
+            document.getElementById('tipoMedicamento-descripcion').textContent = data.descripcion;
+            // Mostrar el modal
+            const modal = new bootstrap.Modal(document.getElementById('tipoMedicamentoModal'));
+            modal.show();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al cargar los datos del tipo de medicamento');
+        });
+}
+</script>
+{% endblock %}
