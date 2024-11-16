@@ -26,8 +26,8 @@ Con este sistema, he puesto en práctica mis conocimientos en desarrollo web con
 
 1. *Clonar el repositorio:*
    ```bash
-   git clone https://github.com/SnayderCJ/Proy_Medical_System.git 
-   cd Proy_Medical_System
+   git clone https://github.com/SnayderCJ/Sistema_Medico.git
+   cd Sistema_Medico
    ```
     
 2. *Crear (o activar) un entorno virtual::*   
