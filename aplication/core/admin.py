@@ -1,7 +1,7 @@
 from django.contrib import admin
 from aplication.core.models import (
     MarcaMedicamento, TipoSangre, Paciente, Especialidad, Doctor, Cargo, Empleado, TipoMedicamento, 
-    Medicamento, Diagnostico
+    Medicamento, Diagnostico, AuditUser
 )
 
 # Registro de TipoSangre
@@ -86,5 +86,8 @@ class MarcaMedicamentoAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'descripcion')
     search_fields = ('nombre',)
 
-
-#
+@admin.register(AuditUser)
+class AuditUserAdmin(admin.ModelAdmin):
+    list_display = ('usuario', 'tabla', 'registroid', 'accion', 'fecha', 'hora', 'estacion')
+    list_filter = ('accion', 'fecha')
+    search_fields = ('usuario__username', 'tabla', 'registroid')

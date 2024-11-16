@@ -6,11 +6,9 @@ from doctor.mixins import ListViewMixin
 
 class AuditUserListView(LoginRequiredMixin,ListViewMixin,ListView):
     model = AuditUser
-    template_name = 'core/audit/list.html'
-    context_object_name = 'audit_users'
-    paginate_by = 20  # Paginar la lista si es necesario
+    template_name = "core/audit/list.html"
+    context_object_name = "audits"
+    paginate_by = 10
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        # Agregar filtros y ordenamiento si es necesario
-        return queryset
+        return AuditUser.objects.all().order_by('-fecha', '-hora')

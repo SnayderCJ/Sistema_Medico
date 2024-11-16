@@ -10,7 +10,7 @@ from aplication.core.views.tipoMedicamento import TipoMedicamentoListView, TipoM
 from aplication.core.views.marcaMedicamento import MarcaMedicamentoListView, MarcaMedicamentoCreateView, MarcaMedicamentoUpdateView, MarcaMedicamentoDeleteView
 from aplication.core.views.medicamento import MedicamentoListView, MedicamentoCreateView, MedicamentoUpdateView, MedicamentoDeleteView, MedicamentoDetailView 
 from aplication.core.views.diagnostico import DiagnosticoListView, DiagnosticoCreateView, DiagnosticoUpdateView, DiagnosticoDeleteView, DiagnosticoDetailView
-
+from aplication.core.views.auditUser import AuditUserListView
  
  
  
@@ -89,4 +89,6 @@ urlpatterns = [
   path('diagnostico_delete/<int:pk>/', DiagnosticoDeleteView.as_view(), name="diagnostico_delete"),
   path('diagnostico_detail/<int:pk>/', DiagnosticoDetailView.as_view(), name="diagnostico_detail"),
   
+  # Auditoria
+  path('auditoria/', AuditUserListView.as_view(), name='audit-list'),
 ]

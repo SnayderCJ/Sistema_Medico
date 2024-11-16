@@ -1,0 +1,32 @@
+<!-- audit/audit_list.html -->
+{% extends "components/base.html" %}
+
+{% block content %}
+<h1>Auditoría de Usuarios</h1>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Usuario</th>
+            <th>Tabla</th>
+            <th>ID Registro</th>
+            <th>Acción</th>
+            <th>Fecha</th>
+            <th>Hora</th>
+            <th>Estación</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for audit in audits %}
+        <tr>
+            <td>{{ audit.usuario }}</td>
+            <td>{{ audit.tabla }}</td>
+            <td>{{ audit.registroid }}</td>
+            <td>{{ audit.get_accion_display }}</td>
+            <td>{{ audit.fecha }}</td>
+            <td>{{ audit.hora }}</td>
+            <td>{{ audit.estacion }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
