@@ -55,13 +55,14 @@ def save_audit(request, model, action):
     # Obtain client ip address
     client_address = ip_client_address(request)
     # Registro en tabla Auditora BD
-    auditusuariotabla = AuditUser(usuario=user,
-                                         tabla=model.__class__.__name__,
-                                         registroid=model.id,
-                                         accion=action,
-                                         fecha=timezone.now().date(),
-                                         hora=timezone.now().time(),
-                                         estacion=client_address)
+    auditusuariotabla = AuditUser(
+        usuario=user,
+        tabla=model.__class__.__name__,
+        registroid=model.id,
+        accion=action,
+        fecha=timezone.now().date(),
+        hora=timezone.now().time(),
+        estacion=client_address)
     auditusuariotabla.save()
 
 # Obtener el IP desde donde se esta accediendo

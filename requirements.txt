@@ -7,6 +7,7 @@ django-extensions==3.2.3
 django-widget-tweaks==1.5.0
 exceptiongroup==1.2.2
 executing==2.1.0
+googlemaps
 ipython==8.29.0
 jedi==0.19.2
 matplotlib-inline==0.1.7

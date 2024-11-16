@@ -7,6 +7,7 @@ from django.http import JsonResponse
 from django.contrib import messages
 from django.db.models import Q
 from doctor.mixins import CreateViewMixin, DeleteViewMixin, ListViewMixin, UpdateViewMixin
+from django.shortcuts import render, get_object_or_404
 from doctor.utils import save_audit
 
 class PatientListView(LoginRequiredMixin,ListViewMixin,ListView):
@@ -17,7 +18,6 @@ class PatientListView(LoginRequiredMixin,ListViewMixin,ListView):
     # paginate_by = 2
     
     def get_queryset(self):
-        # self.query = Q()
         q1 = self.request.GET.get('q') # ver
         sex= self.request.GET.get('sex')
         if q1 is not None: 
@@ -27,11 +27,6 @@ class PatientListView(LoginRequiredMixin,ListViewMixin,ListView):
         if sex == "M" or sex=="F": self.query.add(Q(sexo__icontains=sex), Q.AND)   
         return self.model.objects.filter(self.query).order_by('apellidos')
     
-    # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-        # context['title'] = "SaludSync"
-        # context['title1'] = "Consulta de Pacientes"
-        # return context
     
 class PatientCreateView(LoginRequiredMixin,CreateViewMixin, CreateView):
     model = Paciente
@@ -117,6 +112,7 @@ class PatientDetailView(LoginRequiredMixin,DetailView):
     
     def get(self, request, *args, **kwargs):
         pacient = self.get_object()
+        
         data = {
             'id': pacient.id,
             'nombres': pacient.nombres,
@@ -127,6 +123,11 @@ class PatientDetailView(LoginRequiredMixin,DetailView):
             'dni': pacient.cedula,
             'telefono': pacient.telefono,
             'direccion': pacient.direccion,
+            'latitud': pacient.latitud,
+            'longitud': pacient.longitud,
+            
+            
             # Añade más campos según tu modelo
         }
         return JsonResponse(data)
+    

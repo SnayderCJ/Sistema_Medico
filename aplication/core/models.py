@@ -54,9 +54,9 @@ class Paciente(models.Model):
     # Dirección domiciliaria del paciente
     direccion = models.CharField(max_length=255, verbose_name="Dirección Domiciliaria")
     # Latitud de la ubicación del paciente (coordenada geográfica)
-    latitud = models.DecimalField(max_digits=18, decimal_places=6, verbose_name="Latitud", null=True, blank=True)
+    latitud = models.DecimalField(max_digits=18, decimal_places=14, verbose_name="Latitud", null=True, blank=True)
     # Longitud de la ubicación del paciente (coordenada geográfica)
-    longitud = models.DecimalField(max_digits=18, decimal_places=6, verbose_name="Longitud", null=True, blank=True)
+    longitud = models.DecimalField(max_digits=18, decimal_places=14, verbose_name="Longitud", null=True, blank=True)
     # Historia clínica
     # Relación con el modelo TipoSangre, permite seleccionar el tipo de sangre del paciente
     tipo_sangre = models.ForeignKey(TipoSangre, on_delete=models.SET_NULL, null=True, verbose_name="Tipo de Sangre",related_name="tipos_sangre")
@@ -100,6 +100,7 @@ class Paciente(models.Model):
             return self.foto.url
         else:
             return '/static/img/usuario_anonimo.png'
+
      # Método estático para calcular la edad del paciente
     @staticmethod
     def calcular_edad(fecha_nacimiento):
@@ -149,9 +150,9 @@ class Doctor(models.Model):
     # Direccion del doctor
     direccion = models.CharField(max_length=10, unique=True, verbose_name="Direccion Trabajo")
     # Latitud de la ubicación del paciente (coordenada geográfica)
-    latitud = models.DecimalField(max_digits=18, decimal_places=6, verbose_name="Latitud", null=True, blank=True)
+    latitud = models.DecimalField(max_digits=18, decimal_places=14, verbose_name="Latitud", null=True, blank=True)
     # Longitud de la ubicación del paciente (coordenada geográfica)
-    longitud = models.DecimalField(max_digits=18, decimal_places=6, verbose_name="Longitud", null=True, blank=True)
+    longitud = models.DecimalField(max_digits=18, decimal_places=14, verbose_name="Longitud", null=True, blank=True)
     # Código único del doctor, utilizado para identificarlo internamente en la clínica
     codigoUnicoDoctor = models.CharField(max_length=20, unique=True, verbose_name="Código Único del Doctor")
     # Relación con el modelo Especialidad, permite asociar una o varias especialidades al doctor
@@ -180,6 +181,22 @@ class Doctor(models.Model):
     
     def __str__(self):
         return f"{self.apellidos}"
+    
+    def get_image(self):
+        if self.foto:
+            return self.foto.url
+        else:
+            return '/static/img/usuario_anonimo.png'
+        
+    @staticmethod
+    def calcular_edad(fecha_nacimiento):
+        today = date.today()  # Obtener la fecha actual
+        edad = today.year - fecha_nacimiento.year  # Calcular la diferencia de años
+        # Ajustar la edad si el cumpleaños de este año no ha ocurrido aún
+        if (today.month, today.day) < (fecha_nacimiento.month, fecha_nacimiento.day):
+            edad -= 1  # Restar un año si el cumpleaños no ha pasado
+        return edad  
+    
     class Meta:
         # Nombre singular y plural del modelo en la interfaz administrativa
         verbose_name = "Doctor"
@@ -287,8 +304,8 @@ class MarcaMedicamento(models.Model):
 
     class Meta:
         # Nombre singular y plural del modelo en la interfaz administrativa
-        verbose_name = "Tipo de Medicamento"
-        verbose_name_plural = "Tipos de Medicamentos"
+        verbose_name = "Marca de Medicamento"
+        verbose_name_plural = "Marcas de Medicamentos"
         
 class ActiveMedicationManager(models.Manager):
     # Método para obtener un queryset de pacientes activos

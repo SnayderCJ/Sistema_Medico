@@ -40,7 +40,7 @@
                 </a>
                 <div class="collapse" id="mantenimientoSubmenu">
                     <a class="nav-link" href="{% url 'core:especialidad_list' %}"><i class="fas fa-user-md me-2"></i> Especialidad </a>
-                    <a class="nav-link" href="#"><i class="fas fa-cogs me-2"></i> Doctor</a>
+                    <a class="nav-link" href="{% url 'core:doctor_list' %}"><i class="fas fa-user-nurse me-2"></i> Doctor </a>
                     <a class="nav-link" href="#"><i class="fas fa-cogs me-2"></i> Horarios</a>
                     <a class="nav-link" href="#"><i class="fas fa-cogs me-2"></i> Servicios</a>
                     <a class="nav-link" href="#"><i class="fas fa-cogs me-2"></i> Costos</a>
@@ -240,6 +240,9 @@
      </div>
    </div>
    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+   <script async 
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCx1t2u2KcArNV3hvHCAfOHVLf66uhFLII&callback=initMap">
+    </script>
    {% block js %}{% endblock %}
   </body>
 </html>

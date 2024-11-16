@@ -111,6 +111,8 @@ class EmpleadoDetailView(LoginRequiredMixin,DetailView):
             'edad': empleado.calcular_edad(empleado.fecha_nacimiento),
             'cargo': empleado.cargo.nombre,
             'sueldo': empleado.sueldo,
+            'longitud': empleado.longitud,
+            'latitud': empleado.latitud,
             # Añade más campos según tu modelo
         }
         return JsonResponse(data)

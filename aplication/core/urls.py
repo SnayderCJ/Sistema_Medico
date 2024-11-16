@@ -3,14 +3,14 @@ from aplication.core.views.home import HomeTemplateView
 from aplication.core.views.patient import PatientCreateView, PatientDeleteView, PatientDetailView, PatientListView, PatientUpdateView
 from aplication.core.views.tipoSangre import TipoSangreListView, TipoSangreCreateView, TipoSangreUpdateView, TipoSangreDeleteView, TipoSangreDetailView
 from aplication.core.views.especialidad import EspecialidadListView, EspecialidadCreateView, EspecialidadUpdateView, EspecialidadDeleteView, EspecialidadDetailView
-# from aplication.core.views.doctor import DoctorListView, DoctorCreateView # Seguir con las rutas de doctor
+from aplication.core.views.doctor import DoctorListView, DoctorCreateView, DoctorUpdateView, DoctorDeleteView, DoctorDetailView
 from aplication.core.views.cargo import CargoListView, CargoCreateView, CargoUpdateView, CargoDeleteView, CargoDetailView
 from aplication.core.views.empleado import EmpleadoListView, EmpleadoCreateView, EmpleadoUpdateView, EmpleadoDeleteView, EmpleadoDetailView
 from aplication.core.views.tipoMedicamento import TipoMedicamentoListView, TipoMedicamentoCreateView, TipoMedicamentoUpdateView, TipoMedicamentoDeleteView, TipoMedicamentoDetailView
 from aplication.core.views.marcaMedicamento import MarcaMedicamentoListView, MarcaMedicamentoCreateView, MarcaMedicamentoUpdateView, MarcaMedicamentoDeleteView
 from aplication.core.views.medicamento import MedicamentoListView, MedicamentoCreateView, MedicamentoUpdateView, MedicamentoDeleteView, MedicamentoDetailView 
 from aplication.core.views.diagnostico import DiagnosticoListView, DiagnosticoCreateView, DiagnosticoUpdateView, DiagnosticoDeleteView, DiagnosticoDetailView
-# from aplication.core.views.categoriaExamen import CategoriaExamenListView, CategoriaExamenCreateView, CategoriaExamenUpdateView, CategoriaExamenDeleteView, CategoriaExamenDetailView
+
  
  
  
@@ -18,12 +18,9 @@ app_name='core' # define un espacio de nombre para la aplicacion
 urlpatterns = [
   # ruta principal
   path('', HomeTemplateView.as_view(),name='home'),
-  # rutas doctores VBF
-  # path('doctor_list/', views.doctor_List,name="doctor_list"),
-  # path('doctor_create/', views.doctor_create,name="doctor_create"),
-  # path('doctor_update/<int:id>/', views.doctor_update,name='doctor_update'),
-  # path('doctor_delete/<int:id>/', views.doctor_delete,name='doctor_delete'),
-  # rutas doctores VBC
+  
+  
+  
   path('patient_list/',PatientListView.as_view() ,name="patient_list"),
   path('patient_create/', PatientCreateView.as_view(),name="patient_create"),
   path('patient_update/<int:pk>/', PatientUpdateView.as_view(),name='patient_update'),
@@ -45,9 +42,11 @@ urlpatterns = [
   path('especialidad_detail/<int:pk>/', EspecialidadDetailView.as_view(), name="especialidad_detail"),
   
   # Doctor
-  # path('doctor_list/', DoctorListView.as_view(), name="doctor_list"),
-  # path('doctor_create/', DoctorCreateView.as_view(), name="doctor_create"),
-  # Seguir con las rutas de doctor
+  path('doctor_list/', DoctorListView.as_view(), name="doctor_list"),
+  path('doctor_create/', DoctorCreateView.as_view(), name="doctor_create"),
+  path('doctor_update/<int:pk>/', DoctorUpdateView.as_view(), name="doctor_update"),
+  path('doctor_delete/<int:pk>/', DoctorDeleteView.as_view(), name="doctor_delete"),
+  path('doctor_detail/<int:pk>/', DoctorDetailView.as_view(), name="doctor_detail"),
   
   # Cargo 
   path('cargo_list/', CargoListView.as_view(), name="cargo_list"),
@@ -89,12 +88,5 @@ urlpatterns = [
   path('diagnostico_update/<int:pk>/', DiagnosticoUpdateView.as_view(), name="diagnostico_update"),
   path('diagnostico_delete/<int:pk>/', DiagnosticoDeleteView.as_view(), name="diagnostico_delete"),
   path('diagnostico_detail/<int:pk>/', DiagnosticoDetailView.as_view(), name="diagnostico_detail"),
-  
-  # CategoriaExamen
-  # path('categoriaExamen_list/', CategoriaExamenListView.as_view(), name="categoriaExamen_list"),
-  # path('categoriaExamen_create/', CategoriaExamenCreateView.as_view(), name="categoriaExamen_create"),
-  # path('categoriaExamen_update/<int:pk>/', CategoriaExamenUpdateView.as_view(), name="categoriaExamen_update"),
-  # path('categoriaExamen_delete/<int:pk>/', CategoriaExamenDeleteView.as_view(), name="categoriaExamen_delete"),
-  # path('categoriaExamen_detail/<int:pk>/', CategoriaExamenDetailView.as_view(), name="categoriaExamen_detail"),
   
 ]
