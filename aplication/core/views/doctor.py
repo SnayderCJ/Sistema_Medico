@@ -92,7 +92,9 @@ class DoctorDeleteView(LoginRequiredMixin,DeleteViewMixin,DeleteView):
         messages.success(self.request, success_message)
         return super().delete(request, *args, **kwargs)
 
-class DoctorDetailView(LoginRequiredMixin,DetailView):
+from django.http import JsonResponse
+
+class DoctorDetailView(LoginRequiredMixin, DetailView):
     model = Doctor
 
     def get(self, request, *args, **kwargs):
@@ -105,17 +107,18 @@ class DoctorDetailView(LoginRequiredMixin,DetailView):
             'foto': doctor.get_image(),
             'fecha_nacimiento': doctor.fecha_nacimiento,
             'edad': doctor.calcular_edad(doctor.fecha_nacimiento),
-            'especialidad': doctor.especialidad,
+            'especialidad': [esp.nombre for esp in doctor.especialidad.all()],
             'direccion': doctor.direccion,
             'latitud': doctor.latitud,
             'longitud': doctor.longitud,
             'codigoUnicoDoctor': doctor.codigoUnicoDoctor,
-            'telefonos': doctor.telefonos,
+            'telefono': doctor.telefonos,
             'email': doctor.email,
             'horario_atencion': doctor.horario_atencion,
             'duracion_cita': doctor.duracion_cita,
-            'curriculum': doctor.curriculum,
-            'firmaDigital': doctor.firmaDigital,
-            'imagen_receta': doctor.imagen_receta,
+            'curriculum': doctor.curriculum.url if doctor.curriculum else None,
+            'firmaDigital': doctor.firmaDigital.url if doctor.firmaDigital else None,
+            'imagen_receta': doctor.imagen_receta.url if doctor.imagen_receta else None,
         }
         return JsonResponse(data)
+

@@ -33,16 +33,29 @@
                                 <p><strong><i class="fa-solid fa-calendar me-2"></i>F. Nacimiento:</strong> <span id="doctor-fecha_nacimiento"></span></p>
                                 <p><strong><i class="fas fa-birthday-cake me-2"></i>Edad:</strong> <span id="doctor-edad"></span></p>
                                 <p><strong><i class="fas fa-map-marker-alt me-2"></i>Dirección:</strong> <span id="doctor-direccion"></span></p>
-                                <p><strong><i class="fas fa-map-marker-alt me-2"></i>Latitud:</strong> <span id="doctor-latitud"></span></p>
-                                <p><strong><i class="fas fa-map-marker-alt me-2"></i>Longitud:</strong> <span id="doctor-longitud"></span></p>
                                 <p><strong><i class="fas fa-id-badge me-2"></i>Código Único:</strong> <span id="doctor-codigoUnicoDoctor"></span></p>
-                                <p><strong><i class="fas fa-phone me-2"></i>Teléfonos:</strong> <span id="doctor-telefonos"></span></p>
                                 <p><strong><i class="fas fa-clock me-2"></i>Horario Atención:</strong> <span id="doctor-horario_atencion"></span></p>
                                 <p><strong><i class="fas fa-clock me-2"></i>Duración Cita:</strong> <span id="doctor-duracion_cita"></span></p>
-                                <p><strong><i class="fas fa-file-alt me-2"></i>Curriculum:</strong> <span id="doctor-curriculum"></span></p>
-                                <p><strong><i class="fas fa-signature me-2"></i>Firma Digital:</strong> <span id="doctor-firmaDigital"></span></p>
-                                <p><strong><i class="fas fa-file-prescription me-2"></i>Imagen Receta:</strong> <img id="doctor-imagen_receta" src="" alt="Imagen de la receta" class="img-fluid rounded shadow-sm" style="max-height: 200px; width: auto;"></p>
+                                <p><strong><i class="fas fa-file-alt me-2"></i>Curriculum:</strong> 
+                                    <a id="doctor-curriculum" href="#" download>
+                                        <i class="fas fa-download me-2"></i>
+                                    </a>
+                                </p>
+                                <p><strong><i class="fas fa-signature me-2"></i>Firma Digital:</strong> 
+                                    <a id="doctor-firmaDigital" href="#" download>
+                                        <i class="fas fa-download me-2"></i>
+                                    </a>
+                                </p>
+                                <p><strong><i class="fas fa-file-prescription me-2"></i>Imagen Receta:</strong> 
+                                    <img id="doctor-imagen_receta" src="" alt="Imagen de la receta" class="img-fluid rounded shadow-sm" style="max-height: 200px; width: auto;">
+                                </p>
                             </div>
+                        </div>
+
+                        {% comment %} Ubicacion {% endcomment %}
+                        <div class="modal-body">
+                            <h5 class="fw-bold">Ubicación: </h5>
+                            <div id="map-container" style="height: 150px;"></div>
                         </div>
                     </div>
                 </div>
