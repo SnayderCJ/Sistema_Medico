@@ -3,6 +3,8 @@ from aplication.attention.views.medical_attention import AttentionCreateView, At
 from aplication.attention.views.horarioAtencion import HorarioAtencionCreateView, HorarioAtencionListView, HorarioAtencionUpdateView, HorarioAtencionDeleteView, HorarioAtencionDetailView
 from aplication.attention.views.citaMedica import CitaMedicaCreateView, CitaMedicaListView, CitaMedicaUpdateView, CitaMedicaDeleteView, CitaMedicaDetailView
 
+from aplication.attention.views.serviciosAdicionales import ServiciosAdicionalesCreateView, ServiciosAdicionalesListView, ServiciosAdicionalesUpdateView, ServiciosAdicionalesDeleteView, ServiciosAdicionalesDetailView
+
 app_name='attention' # define un espacio de nombre para la aplicacion
 
 urlpatterns = [
@@ -26,4 +28,17 @@ urlpatterns = [
   path('cita_update/<int:pk>/', CitaMedicaUpdateView.as_view(),name='citaMedica_update'),
   path('cita_detail/<int:pk>/', CitaMedicaDetailView.as_view(),name='citaMedica_detail'),
   path('cita_delete/<int:pk>/', CitaMedicaDeleteView.as_view(),name='citaMedica_delete'),
+  
+  # Detalle Atencion 
+  
+  
+  
+  
+  
+  # Servicios Adicionales
+  path('servicio_list/',ServiciosAdicionalesListView.as_view() ,name="servicio_list"),
+  path('servicio_create/', ServiciosAdicionalesCreateView.as_view(),name="servicio_create"),
+  path('servicio_update/<int:pk>/', ServiciosAdicionalesUpdateView.as_view(),name='servicio_update'),
+  path('servicio_delete/<int:pk>/', ServiciosAdicionalesDeleteView.as_view(),name='servicio_delete'),
+  path('servicio_detail/<int:pk>/', ServiciosAdicionalesDetailView.as_view(),name='servicio_detail'),
 ]
