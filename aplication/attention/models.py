@@ -23,7 +23,7 @@ class HorarioAtencion(models.Model):
 
     class Meta:
         # Nombre singular y plural del modelo en la interfaz administrativa
-        verbose_name = "Horario de Atenciónl Doctor"
+        verbose_name = "Horario de Atención Doctor"
         verbose_name_plural = "Horarios de Atención de los Doctores"
 
 # modelo que almacena los datos de la cita de los pacientes
@@ -103,7 +103,6 @@ class Atencion(models.Model):
         else:
             return None
         
-
     def __str__(self):
         return f"Atención de {self.paciente} el {self.fecha_atencion}"
 

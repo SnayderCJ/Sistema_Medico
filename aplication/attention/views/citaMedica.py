@@ -93,9 +93,6 @@ class CitaMedicaDeleteView(LoginRequiredMixin, DeleteViewMixin, DeleteView):
         self.object = self.get_object()
         success_message = f"Éxito al eliminar lógicamente la cita medica {self.object.name}."
         messages.success(self.request, success_message)
-        # Cambiar el estado de eliminado lógico
-        # self.object.deleted = True
-        # self.object.save()
         return super().delete(request, *args, **kwargs)
     
 class CitaMedicaDetailView(LoginRequiredMixin,DetailView):
