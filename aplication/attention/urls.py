@@ -29,12 +29,6 @@ urlpatterns = [
   path('cita_detail/<int:pk>/', CitaMedicaDetailView.as_view(),name='citaMedica_detail'),
   path('cita_delete/<int:pk>/', CitaMedicaDeleteView.as_view(),name='citaMedica_delete'),
   
-  # Detalle Atencion 
-  
-  
-  
-  
-  
   # Servicios Adicionales
   path('servicio_list/',ServiciosAdicionalesListView.as_view() ,name="servicio_list"),
   path('servicio_create/', ServiciosAdicionalesCreateView.as_view(),name="servicio_create"),

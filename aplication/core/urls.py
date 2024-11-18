@@ -20,7 +20,6 @@ urlpatterns = [
   path('', HomeTemplateView.as_view(),name='home'),
   
   
-  
   path('patient_list/',PatientListView.as_view() ,name="patient_list"),
   path('patient_create/', PatientCreateView.as_view(),name="patient_create"),
   path('patient_update/<int:pk>/', PatientUpdateView.as_view(),name='patient_update'),

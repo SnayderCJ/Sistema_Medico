@@ -200,4 +200,32 @@ class CostoAtencionDetalle(models.Model):
         verbose_name = "Costo detalle Atención"
         verbose_name_plural = "Costos detalles Atención"
 
+class ExamenSolicitado(models.Model):
+    # Nombre o tipo de examen solicitado (ej. Hemograma, Radiografía, etc.)
+    nombre_examen = models.CharField(max_length=255, verbose_name="Nombre del Examen")
+    # Relación con el modelo Paciente, identifica al paciente que recibe la atención médica
+    paciente = models.ForeignKey(Paciente, on_delete=models.PROTECT, verbose_name="Paciente",related_name="pacientes_examenes")
+    # Fecha en la que se solicitó el examen
+    fecha_solicitud = models.DateField(auto_now_add=True, verbose_name="Fecha de Solicitud")
+    # Campo adicional: archivo para subir el resultado del examen (opcional)
+    resultado = models.FileField(upload_to='resultados_examenes/', null=True, blank=True, verbose_name="Resultado del Examen")
+    # Comentarios adicionales sobre el examen, si es necesario
+    comentario = models.TextField(null=True, blank=True, verbose_name="Comentario")
+    # Estado del examen (ej. Pendiente, En Proceso, Completado)
+    estado = models.CharField(
+        max_length=20,
+        choices=EXAMEN_CHOICES,
+        verbose_name="Estado del Examen"
+    )
+
+    def __str__(self):
+        return f"Examen {self.nombre_examen}"
+
+    class Meta:
+        # Ordena los exámenes por fecha de solicitud
+        ordering = ['-fecha_solicitud']
+        
+        # Nombre singular y plural del modelo en la interfaz administrativa
+        verbose_name = "Examen Médico"
+        verbose_name_plural = "Exámenes Médicos"
 

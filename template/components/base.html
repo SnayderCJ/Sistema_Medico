@@ -26,14 +26,14 @@
                 <h5 class="text-white">{{request.user}}</h5>
             </div>
             <nav class="nav flex-column mt-4">
-                <a class="nav-link active" href="#"><i class="fas fa-home me-2"></i> Dashboard</a>
+                <a class="nav-link active" href="/"><i class="fas fa-home me-2"></i> Dashboard</a>
                 <a class="nav-link" href="{% url 'attention:citaMedica_list' %}"><i class="fas fa-calendar-alt me-2"></i> Citas</a>
                 <a class="nav-link" href="{% url 'core:patient_list' %}"><i class="fas fa-user-injured me-2"></i> Pacientes</a>
-                
                 <a class="nav-link" href="{% url 'attention:attention_list' %}"><i class="fas fa-procedures me-2"></i> Atencion</a>
                 <a class="nav-link" href="{% url 'attention:attention_list' %}"><i class="fas fa-procedures me-2"></i>Ficha Clinica</a>
                 <a class="nav-link" href="#"><i class="fas fa-stethoscope me-2"></i>Pagos</a>
                 <a class="nav-link" href="#"><i class="fas fa-stethoscope me-2"></i>Examenes</a>
+
                 <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#mantenimientoSubmenu" aria-expanded="false" aria-controls="mantenimientoSubmenu">
                     <i class="fas fa-tools me-2"></i> Mantenimiento
                 </a>

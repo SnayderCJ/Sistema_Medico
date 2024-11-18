@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+from celery.schedules import crontab
 import os
 from dotenv import load_dotenv
 # Cargar las variables de entorno desde el archivo .env
@@ -143,3 +144,11 @@ LOGIN_URL = '/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # O el host de tu proveedor de correo
+EMAIL_HOST_USER = 'techgamingec@gmail.com'  # Tu dirección de correo
+EMAIL_HOST_PASSWORD = 'Snayder2004'  # Tu contraseña de correo
+EMAIL_PORT = 587  # O el puerto de tu proveedor de correo
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'techgamingec@gmail.com'

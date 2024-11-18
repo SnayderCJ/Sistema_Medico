@@ -5,7 +5,6 @@ from django.urls import reverse_lazy
 from django.db import transaction
 from aplication.attention.forms.medical_attention import AttentionForm
 from aplication.attention.models import Atencion, DetalleAtencion
-from aplication.core.forms.patient import PatientForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView, DetailView
 from django.http import JsonResponse
@@ -33,12 +32,6 @@ class AttentionListView(LoginRequiredMixin,ListViewMixin,ListView):
         if sex == "M" or sex=="F": self.query.add(Q(paciente__sexo__icontains=sex), Q.AND)   
         return self.model.objects.filter(self.query).order_by('-fecha_atencion')
     
-    # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-        # context['title'] = "SaludSync"
-        # context['title1'] = "Consulta de Pacientes"
-        # return context
-    
 class AttentionCreateView(LoginRequiredMixin,CreateViewMixin, CreateView):
     model = Atencion
     template_name = 'attention/medical_attention/form.html'
@@ -56,9 +49,7 @@ class AttentionCreateView(LoginRequiredMixin,CreateViewMixin, CreateView):
     def post(self, request, *args, **kwargs):
         # Convertir el cuerpo de la solicitud a un diccionario Python
         data = json.loads(request.body)
-        print(data)
         medicamentos = data['medicamentos']  
-        print(medicamentos)
         #Crear una instancia del formulario y poblarla con los datos JSON
         try:
             with transaction.atomic():
@@ -134,12 +125,10 @@ class AttentionUpdateView(LoginRequiredMixin,UpdateViewMixin,UpdateView):
     def post(self, request, *args, **kwargs):
         # Convertir el cuerpo de la solicitud a un diccionario Python
         data = json.loads(request.body)
-        print(data)
         medicamentos = data['medicamentos']  
         print(medicamentos)
         try:
              atencion = Atencion.objects.get(id=self.kwargs.get('pk'))
-             print(atencion)
              with transaction.atomic():
                 # Crear la instancia del modelo Atencion
                 atencion.paciente_id=int(data['paciente'])
@@ -156,17 +145,13 @@ class AttentionUpdateView(LoginRequiredMixin,UpdateViewMixin,UpdateView):
                 atencion.examen_fisico=data['examenFisico']
                 atencion.examenes_enviados=data['examenesEnviados']
                 atencion.comentario_adicional=data['comentarioAdicional']
-                print("datos de diagnostico")
                 diagnostico_ids = data.get('diagnostico', [])
-                print("diag=",diagnostico_ids)
                 diagnosticos = Diagnostico.objects.filter(id__in=diagnostico_ids)
                 atencion.diagnostico.set(diagnosticos)
                 atencion.save()
-                print("grabo atencion")
                 # borrar el detalle asociado a esa atencion
                 DetalleAtencion.objects.filter(atencion_id=atencion.id).delete()
                 # Ahora procesamos el arreglo de medicamentos
-                print("voy a medicamentos update")
                 for medicamento in medicamentos:
                     #Crear el detalle de atención para cada medicamento
                     DetalleAtencion.objects.create(
@@ -188,9 +173,7 @@ class AttentionDetailView(LoginRequiredMixin,DetailView):
     model = Atencion
     
     def get(self, request, *args, **kwargs):
-        print("entro get")
         atencion = self.get_object()
-        print(atencion)
         detail_atencion =list(DetalleAtencion.objects.filter(atencion_id=atencion.id).values("medicamento_id","medicamento__nombre","cantidad","prescripcion"))
         detail_atencion=json.dumps(detail_atencion,default=custom_serializer)
         data = {
@@ -199,5 +182,4 @@ class AttentionDetailView(LoginRequiredMixin,DetailView):
             'foto': atencion.paciente.get_image(),
             'detalle_atencion': detail_atencion
         }
-        print(data)
         return JsonResponse(data)

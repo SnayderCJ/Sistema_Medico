@@ -244,6 +244,8 @@
     </div>
 </div>
 {% endblock %}
+
+
 {% block js %}
  <script>
  class AtencionMedica {
@@ -265,7 +267,6 @@
         this.comentarioAdicional = '';
         this.diagnostico = [];
         this.medicamentos = []
-        console.log("detalle")
         //console.log(detalleUpdate)
 
         if (detalleUpdate && detalleUpdate.length > 0){
@@ -279,7 +280,6 @@
             });
             this.syncTable();
         }
-        console.log(this.medicamentos)
     }
 
     // Método para añadir un medicamento al arreglo
