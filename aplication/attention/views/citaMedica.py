@@ -46,12 +46,35 @@ class CitaMedicaCreateView(LoginRequiredMixin, CreateViewMixin, CreateView):
         response = super().form_valid(form)
         citamedica = self.object
         
-        # Enviar notificación por correo electrónico
+        # Envío de correo al paciente con formato mejorado
+        subject = "🏥 Confirmación de tu Cita Médica"
+        message = f"""
+        ¡Hola {citamedica.paciente.nombres}!
+
+        Tu cita médica ha sido programada exitosamente. A continuación, los detalles:
+
+        📅 Fecha: {citamedica.fecha.strftime('%d/%m/%Y')}
+        ⏰ Hora: {citamedica.hora_cita.strftime('%H:%M')}
+        📋 Estado: {citamedica.estado}
+
+        Recordatorios importantes:
+        • Por favor, llegue 10 minutos antes de su cita
+        • Traiga su documento de identidad
+        • Si necesita cancelar, háganoslo saber con 24 horas de anticipación
+
+        ¡Gracias por confiar en nuestros servicios médicos!
+
+        Atentamente,
+        El equipo médico
+        ------------------------------------------
+        Este es un correo automático, por favor no responder.
+        """
+        recipient_email = citamedica.paciente.email
         send_mail(
-            'Cita médica agendada',
-            f'Estimado(a) {citamedica.paciente.nombre_completo},\n\nLe informamos que su cita médica con el Dr. {citamedica.doctor.nombre_completo} ha sido agendada para el día {citamedica.fecha} a las {citamedica.hora_cita}.\n\nAtentamente,\nClínica SaludSync',
-            settings.EMAIL_HOST_USER,  # Asegúrate de configurar EMAIL_HOST_USER en settings.py
-            [citamedica.paciente.email],
+            subject,
+            message,
+            from_email=None,
+            recipient_list=[recipient_email],
             fail_silently=False,
         )
         
@@ -81,12 +104,30 @@ class CitaMedicaUpdateView(LoginRequiredMixin, UpdateViewMixin, UpdateView):
         response = super().form_valid(form)
         citamedica = self.object
         
-        # Enviar notificación por correo electrónico
+        # Enviar correo electrónico de modificación de cita
+        subject = "🏥 Tu Cita Médica ha sido Modificada"
+        message = f"""
+        ¡Hola {citamedica.paciente.nombres}!
+
+        Te informamos que tu cita médica ha sido modificada. Los nuevos detalles son:
+
+        📅 Fecha: {citamedica.fecha.strftime('%d/%m/%Y')}
+        ⏰ Hora: {citamedica.hora_cita.strftime('%H:%M')}
+        📋 Estado: {citamedica.get_estado_display()}
+
+        Si tienes alguna pregunta, no dudes en contactarnos.
+
+        Atentamente,
+        El equipo médico
+        ------------------------------------------
+        Este es un correo automático, por favor no responder.
+        """
+        recipient_email = citamedica.paciente.email
         send_mail(
-            'Cita médica modificada',
-            f'Estimado(a) {citamedica.paciente.nombre_completo},\n\nLe informamos que su cita médica con el Dr. {citamedica.doctor.nombre_completo} ha sido modificada para el día {citamedica.fecha} a las {citamedica.hora_cita}.\n\nAtentamente,\nClínica SaludSync',
-            settings.EMAIL_HOST_USER,
-            [citamedica.paciente.email],
+            subject,
+            message,
+            from_email=None,
+            recipient_list=[recipient_email],
             fail_silently=False,
         )
         
@@ -117,12 +158,26 @@ class CitaMedicaDeleteView(LoginRequiredMixin, DeleteViewMixin, DeleteView):
         self.object = self.get_object()
         citamedica = self.object
         
-        # Enviar notificación por correo electrónico
+        # Enviar correo electrónico de cancelación de cita
+        subject = "🏥 Tu Cita Médica ha sido Cancelada"
+        message = f"""
+        ¡Hola {citamedica.paciente.nombres}!
+
+        Lamentamos informarte que tu cita médica ha sido cancelada. 
+
+        Si deseas reprogramar tu cita, por favor contáctanos.
+
+        Atentamente,
+        El equipo médico
+        ------------------------------------------
+        Este es un correo automático, por favor no responder.
+        """
+        recipient_email = citamedica.paciente.email
         send_mail(
-            'Cita médica cancelada',
-            f'Estimado(a) {citamedica.paciente.nombre_completo},\n\nLe informamos que su cita médica con el Dr. {citamedica.doctor.nombre_completo} ha sido cancelada.\n\nAtentamente,\nClínica SaludSync',
-            settings.EMAIL_HOST_USER,
-            [citamedica.paciente.email],
+            subject,
+            message,
+            from_email=None,
+            recipient_list=[recipient_email],
             fail_silently=False,
         )
         
@@ -155,12 +210,20 @@ def enviar_notificacion_cita(cita, asunto, mensaje):
     )
 
 def enviar_recordatorios():
-    ahora = timezone.now()
-    mañana = ahora + timedelta(days=1)
-    citas_proximamente = CitaMedica.objects.filter(fecha=mañana, estado='P')  # 'P' para Programada
+    hoy = timezone.now().date()  # Obtener la fecha de hoy
+
+    citas_proximamente = CitaMedica.objects.filter(
+        fecha__gte=hoy,  # Filtrar citas con fecha mayor o igual a hoy
+        estado='P'       # 'P' para Programada
+    )
     for cita in citas_proximamente:
-        enviar_notificacion_cita(
-            cita,
-            'Recordatorio de cita médica',
-            f'Estimado(a) {cita.paciente.nombre_completo},\n\nLe recordamos que tiene una cita médica con el Dr. {cita.doctor.nombre_completo} mañana a las {cita.hora_cita}.\n\nAtentamente,\nClínica SaludSync'
-        )
+        dias_hasta_cita = (cita.fecha - hoy).days  # Calcular los días hasta la cita
+
+        if dias_hasta_cita == 0:
+            asunto = 'Recordatorio de cita médica (hoy)'
+            mensaje = f'Estimado(a) {cita.paciente.nombre_completo},\n\nLe recordamos que tiene una cita médica con el Dr. {cita.doctor.nombre_completo} hoy a las {cita.hora_cita}.\n\nAtentamente,\nClínica SaludSync'
+        else:
+            asunto = f'Recordatorio de cita médica (en {dias_hasta_cita} días)'
+            mensaje = f'Estimado(a) {cita.paciente.nombre_completo},\n\nLe recordamos que tiene una cita médica con el Dr. {cita.doctor.nombre_completo} el {cita.fecha} a las {cita.hora_cita}.\n\nAtentamente,\nClínica SaludSync'
+
+        enviar_notificacion_cita(cita, asunto, mensaje)

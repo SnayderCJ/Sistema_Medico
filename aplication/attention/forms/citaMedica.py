@@ -1,5 +1,6 @@
 from django.forms import ModelForm, ValidationError
 from django import forms
+from django.utils.timezone import now
 from aplication.attention.models import CitaMedica
 
 # Definición de la clase CitaMedicaForm que hereda de ModelForm
@@ -38,6 +39,12 @@ class CitaMedicaForm(ModelForm):
             ),
         }
 
+    def clean_fecha(self):
+        fecha = self.cleaned_data.get("fecha")
+        if fecha < now().date():
+            raise ValidationError("No se puede ingresar una fecha anterior a la actual.")
+        return fecha
+    
     # Método de limpieza para validar la hora de la cita
     def clean_hora_cita(self):
         hora_cita = self.cleaned_data.get("hora_cita")

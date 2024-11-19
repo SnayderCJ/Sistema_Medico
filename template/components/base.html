@@ -34,10 +34,10 @@
                 <a class="nav-link" href="#"><i class="fas fa-stethoscope me-2"></i>Pagos</a>
                 <a class="nav-link" href="#"><i class="fas fa-stethoscope me-2"></i>Examenes</a>
 
-                <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#mantenimientoSubmenu" aria-expanded="false" aria-controls="mantenimientoSubmenu">
+                <a class="nav-link" href="#">
                     <i class="fas fa-tools me-2"></i> Mantenimiento
                 </a>
-                <div class="collapse" id="mantenimientoSubmenu">
+                <div>
                     <a class="nav-link" href="{% url 'core:especialidad_list' %}"><i class="fas fa-user-md me-2"></i> Especialidad </a>
                     <a class="nav-link" href="{% url 'core:doctor_list' %}"><i class="fas fa-user-nurse me-2"></i> Doctor </a>
                     <a class="nav-link" href="{% url 'attention:horario_list' %}"><i class="fas fa-clock me-2"></i> Horarios</a>
@@ -151,7 +151,8 @@
                         <div class="card-body">
                             <h5 class="card-title mb-4">Acciones Rápidas</h5>
                             <div class="quick-actions d-flex flex-wrap gap-3">
-                                <button class="btn btn-primary"><i class="fas fa-plus-circle me-2"></i>Cita</button>
+                                <a class="btn btn-primary" href="{% url 'attention:citaMedica_list' %}"><i class="fas fa-plus-circle me-2"></i>Cita</a>
+
                                 <a class="btn btn-success text-white d-inline-flex align-items-center" href="{% url 'core:patient_list' %}">
                                   <i class="fas fa-user-plus me-2"></i>
                                   Paciente 
@@ -243,6 +244,7 @@
    <script 
    async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCx1t2u2KcArNV3hvHCAfOHVLf66uhFLII&callback=initMap">
     </script>
+    <script src="https://cdn.tailwindcss.com"></script>
    {% block js %}{% endblock %}
   </body>
 </html>
