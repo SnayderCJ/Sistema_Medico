@@ -12,6 +12,9 @@ __pycache__/
 .vscode/
 .idea/
 
+# Archivos de configuración de entorno
+.env
+
 # Archivos y directorios de logs
 *.log
 logs/

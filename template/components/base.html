@@ -32,7 +32,7 @@
                 <a class="nav-link" href="{% url 'attention:attention_list' %}"><i class="fas fa-procedures me-2"></i> Atencion</a>
                 <a class="nav-link" href="{% url 'attention:attention_list' %}"><i class="fas fa-procedures me-2"></i>Ficha Clinica</a>
                 <a class="nav-link" href="#"><i class="fas fa-stethoscope me-2"></i>Pagos</a>
-                <a class="nav-link" href="#"><i class="fas fa-stethoscope me-2"></i>Examenes</a>
+                <a class="nav-link" href="{% url 'attention:examen_list' %}"><i class="fas fa-stethoscope me-2"></i>Examenes</a>
 
                 <a class="nav-link" href="#">
                     <i class="fas fa-tools me-2"></i> Mantenimiento
@@ -97,7 +97,7 @@
                             </div>
                             <div>
                                 <h6 class="card-title mb-0">Citas Hoy</h6>
-                                <h3 class="mb-0">24</h3>
+                                <h3 class="mb-0">{{can_cita}}</h3>
                             </div>
                         </div>
                     </div>
@@ -163,7 +163,7 @@
                                
                                 <a class="btn btn-danger"><i class="fas fa-notes-medical me-2"></i>Ficha Clinica</a>
                                  <a class="btn btn-secondary text-white" href="#" ><i class="fas fa-file-medical me-2"></i>Pagos</a>
-                                 <a class="btn btn-warning text-white" href="#" ><i class="fas fa-file-medical me-2"></i>Examenes</a>
+                                 <a class="btn btn-warning text-white" href="{% url 'attention:examen_list' %}" ><i class="fas fa-file-medical me-2"></i>Examenes</a>
 
                             </div>
                         </div>
@@ -241,9 +241,7 @@
      </div>
    </div>
    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
-   <script 
-   async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCx1t2u2KcArNV3hvHCAfOHVLf66uhFLII&callback=initMap">
-    </script>
+   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCx1t2u2KcArNV3hvHCAfOHVLf66uhFLII&callback=initMap"></script>
     <script src="https://cdn.tailwindcss.com"></script>
    {% block js %}{% endblock %}
   </body>

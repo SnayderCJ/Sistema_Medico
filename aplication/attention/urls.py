@@ -2,8 +2,8 @@ from django.urls import path
 from aplication.attention.views.medical_attention import AttentionCreateView, AttentionDetailView, AttentionListView, AttentionUpdateView
 from aplication.attention.views.horarioAtencion import HorarioAtencionCreateView, HorarioAtencionListView, HorarioAtencionUpdateView, HorarioAtencionDeleteView, HorarioAtencionDetailView
 from aplication.attention.views.citaMedica import CitaMedicaCreateView, CitaMedicaListView, CitaMedicaUpdateView, CitaMedicaDeleteView, CitaMedicaDetailView
-
 from aplication.attention.views.serviciosAdicionales import ServiciosAdicionalesCreateView, ServiciosAdicionalesListView, ServiciosAdicionalesUpdateView, ServiciosAdicionalesDeleteView, ServiciosAdicionalesDetailView
+from aplication.attention.views.examenSolicitado import ExamenSolicitadoCreateView, ExamenSolicitadoListView, ExamenSolicitadoUpdateView, ExamenSolicitadoDeleteView, ExamenSolicitadoDetailView
 
 app_name='attention' # define un espacio de nombre para la aplicacion
 
@@ -35,4 +35,11 @@ urlpatterns = [
   path('servicio_update/<int:pk>/', ServiciosAdicionalesUpdateView.as_view(),name='servicio_update'),
   path('servicio_delete/<int:pk>/', ServiciosAdicionalesDeleteView.as_view(),name='servicio_delete'),
   path('servicio_detail/<int:pk>/', ServiciosAdicionalesDetailView.as_view(),name='servicio_detail'),
+  
+  # Examen Solicitado
+  path('examen_list/',ExamenSolicitadoListView.as_view() ,name="examen_list"),
+  path('examen_create/', ExamenSolicitadoCreateView.as_view(),name="examen_create"),
+  path('examen_update/<int:pk>/', ExamenSolicitadoUpdateView.as_view(),name='examen_update'),
+  path('examen_delete/<int:pk>/', ExamenSolicitadoDeleteView.as_view(),name='examen_delete'),
+  path('examen_detail/<int:pk>/', ExamenSolicitadoDetailView.as_view(),name='examen_detail'),
 ]

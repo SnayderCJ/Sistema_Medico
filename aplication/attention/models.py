@@ -54,6 +54,10 @@ class CitaMedica(models.Model):
         # Nombre singular y plural del modelo en la interfaz administrativa
         verbose_name = "Cita Médica"
         verbose_name_plural = "Citas Médicas"
+        
+    @staticmethod
+    def cantidad_cita():
+       return CitaMedica.objects.all().count()
 
 # Modelo que representa la cabecera de una atención médica.
 # Contiene la información general del paciente, diagnóstico, motivo de consulta y tratamiento.
@@ -207,6 +211,8 @@ class ExamenSolicitado(models.Model):
     paciente = models.ForeignKey(Paciente, on_delete=models.PROTECT, verbose_name="Paciente",related_name="pacientes_examenes")
     # Fecha en la que se solicitó el examen
     fecha_solicitud = models.DateField(auto_now_add=True, verbose_name="Fecha de Solicitud")
+    
+    costo = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Costo del Examen")
     # Campo adicional: archivo para subir el resultado del examen (opcional)
     resultado = models.FileField(upload_to='resultados_examenes/', null=True, blank=True, verbose_name="Resultado del Examen")
     # Comentarios adicionales sobre el examen, si es necesario
