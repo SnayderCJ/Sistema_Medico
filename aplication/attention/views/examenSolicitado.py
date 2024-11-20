@@ -28,7 +28,7 @@ class ExamenSolicitadoListView(LoginRequiredMixin, ListViewMixin, ListView):
       elif estado == "R":
           self.query &= Q(estado='R')
 
-      return self.model.objects.filter(self.query).order_by('estado')
+      return self.model.objects.filter(self.query).order_by('-fecha_solicitud')
 
 
 class ExamenSolicitadoCreateView(LoginRequiredMixin, CreateViewMixin, CreateView):
@@ -106,9 +106,12 @@ class ExamenSolicitadoDetailView(LoginRequiredMixin, DetailView):
       examen = self.get_object()
       data = {
          'id': examen.id,
+         'paciente': str(examen.paciente),
          'nombre_examen': examen.nombre_examen,
-         'costo_examen': examen.costo_examen,
-         'descripcion': examen.descripcion,
+         'costo': examen.costo,
+         'fecha_solicitud': str(examen.fecha_solicitud),
+         'resultado_archivo': examen.resultado.url if examen.resultado else None,
+         'comentario': examen.comentario, 
          # Añade más campos según tu modelo
       }
       return JsonResponse(data)
