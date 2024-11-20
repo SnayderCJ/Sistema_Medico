@@ -63,6 +63,9 @@
                               <i class="fa-solid fa-trash"></i>
                             </button>
                           {% endwith %}
+                          <a href="{% url 'attention:certificado_pdf' item.id %}" class="btn btn-info btn-sm" title="Generar PDF">
+                            <i class="fas fa-file-pdf"></i> PDF
+                          </a>
                         </div>
                       </td>
                     </tr>
@@ -137,6 +140,8 @@
           document.getElementById('certificado-id').textContent = data.id;
           document.getElementById('certificado-paciente').textContent = data.paciente;
           document.getElementById('certificado-doctor').textContent = data.doctor;
+          const diagnosticos = data.diagnostico.map(d => `${d.codigo}: ${d.descripcion}`).join(', ');
+          document.getElementById('certificado-diagnostico').textContent = diagnosticos;
           document.getElementById('certificado-tipo_certificado').textContent = data.tipo_certificado;
           document.getElementById('certificado-fecha_emision').textContent = data.fecha_emision;
           document.getElementById('certificado-observaciones').textContent = data.observaciones;

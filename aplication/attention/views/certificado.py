@@ -1,24 +1,17 @@
 from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-from django.shortcuts import get_object_or_404
-from django.http import HttpResponse
 from aplication.attention.models import Certificado
 from django.db.models import Q
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from aplication.attention.forms.certificado import CertificadoForm
-# from reportlab.pdfgen import canvas
 from doctor.mixins import CreateViewMixin, DeleteViewMixin, ListViewMixin, UpdateViewMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from doctor.utils import save_audit
+from django.template.loader import render_to_string
+from weasyprint import HTML
 
 
-class GenerarCertificadoView(LoginRequiredMixin, CreateViewMixin, CreateView):
-   
-    model = Certificado
-    form_class = CertificadoForm
-    template_name = 'attention/generar_certificado.html'
-    success_url = reverse_lazy('attention:certificado_list')  # O la URL que desees
     
 class CertificadoListView(LoginRequiredMixin, ListViewMixin, ListView):
     template_name = "attention/certificado/list.html"
@@ -111,12 +104,36 @@ class CertificadoDetailView(LoginRequiredMixin, DetailView):
         certificado = self.get_object()
         data = {
             'id': certificado.id,
-            'paciente': certificado.paciente.nombre,
-            'doctor': certificado.doctor.nombre,
+            'paciente': certificado.paciente.nombres,
+            'doctor': certificado.doctor.nombres,
+            'diagnostico': [
+                {'codigo': c.codigo, 'descripcion': c.descripcion} for c in certificado.diagnostico.all()
+            ],
             'fecha_emision': certificado.fecha_emision,
             'tipo_certificado': certificado.tipo_certificado,
             'observaciones': certificado.observaciones,
         }
         return JsonResponse(data)
+    
+class CertificadoPDFView(LoginRequiredMixin, DetailView):
+    model = Certificado
+    template_name = 'attention/certificado/pdf_template.html'  # Plantilla HTML del PDF
+    context_object_name = 'certificado'
+    
+    def get(self, request, *args, **kwargs):
+        certificado = self.get_object()
+
+        # Renderizar el HTML que será convertido a PDF
+        html_content = render_to_string(self.template_name, {'certificado': certificado})
+        
+        # Generar el PDF
+        pdf = HTML(string=html_content).write_pdf()
+
+        # Retornar el PDF como una respuesta HTTP
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="certificado_{certificado.id}.pdf"'
+        return response
+
+
 
 

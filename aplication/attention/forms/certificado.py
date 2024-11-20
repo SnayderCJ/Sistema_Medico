@@ -1,13 +1,12 @@
 from django.forms import ModelForm, ValidationError
 from django import forms
 from aplication.attention.models import Certificado
-from django.utils.timezone import now
 
 # Definición de la clase CertificadoForm que hereda de ModelForm
 class CertificadoForm(ModelForm):
     class Meta:
         model = Certificado
-        fields = ["paciente", "doctor", "tipo_certificado", "observaciones"]
+        fields = ["paciente", "doctor", "diagnostico", "tipo_certificado", "observaciones"]
 
         # Personalización de los widgets para el formulario de Certificado
         widgets = {
@@ -19,6 +18,12 @@ class CertificadoForm(ModelForm):
             "doctor": forms.Select(
                 attrs={
                     "class": "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5",
+                }
+            ),
+            "diagnostico": forms.SelectMultiple(
+                attrs={
+                    "class": "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5",
+                    "placeholder": "Diagnóstico (opcional)"
                 }
             ),
             "tipo_certificado": forms.TextInput(

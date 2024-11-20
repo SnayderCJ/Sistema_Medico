@@ -92,8 +92,6 @@ class DoctorDeleteView(LoginRequiredMixin,DeleteViewMixin,DeleteView):
         messages.success(self.request, success_message)
         return super().delete(request, *args, **kwargs)
 
-from django.http import JsonResponse
-
 class DoctorDetailView(LoginRequiredMixin, DetailView):
     model = Doctor
 

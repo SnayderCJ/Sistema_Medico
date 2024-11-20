@@ -238,7 +238,7 @@ class ExamenSolicitado(models.Model):
 class Certificado(models.Model):
     paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE, verbose_name="Paciente")
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE, verbose_name="Doctor")
-
+    diagnostico = models.ManyToManyField(Diagnostico, verbose_name="Diagnósticos", related_name="certificados_diagnosticos")
     fecha_emision = models.DateField(auto_now_add=True, verbose_name="Fecha de Emisión")
     tipo_certificado = models.CharField(max_length=100, verbose_name="Tipo de Certificado")
     observaciones = models.TextField(blank=True, verbose_name="Observaciones")

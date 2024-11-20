@@ -4,7 +4,7 @@ from aplication.attention.views.horarioAtencion import HorarioAtencionCreateView
 from aplication.attention.views.citaMedica import CitaMedicaCreateView, CitaMedicaListView, CitaMedicaUpdateView, CitaMedicaDeleteView, CitaMedicaDetailView
 from aplication.attention.views.serviciosAdicionales import ServiciosAdicionalesCreateView, ServiciosAdicionalesListView, ServiciosAdicionalesUpdateView, ServiciosAdicionalesDeleteView, ServiciosAdicionalesDetailView
 from aplication.attention.views.examenSolicitado import ExamenSolicitadoCreateView, ExamenSolicitadoListView, ExamenSolicitadoUpdateView, ExamenSolicitadoDeleteView, ExamenSolicitadoDetailView
-from aplication.attention.views.certificado import CertificadoCreateView, CertificadoListView, CertificadoUpdateView, CertificadoDeleteView, CertificadoDetailView
+from aplication.attention.views.certificado import CertificadoCreateView, CertificadoListView, CertificadoUpdateView, CertificadoDeleteView, CertificadoDetailView, CertificadoPDFView
 
 app_name='attention' # define un espacio de nombre para la aplicacion
 
@@ -50,4 +50,5 @@ urlpatterns = [
   path('certificado_update/<int:pk>/', CertificadoUpdateView.as_view(),name='certificado_update'),
   path('certificado_delete/<int:pk>/', CertificadoDeleteView.as_view(),name='certificado_delete'),
   path('certificado_detail/<int:pk>/', CertificadoDetailView.as_view(),name='certificado_detail'),
+  path('certificado_pdf/<int:pk>/', CertificadoPDFView.as_view(), name='certificado_pdf'),
 ]
