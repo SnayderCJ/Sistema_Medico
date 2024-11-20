@@ -85,7 +85,7 @@
     }
 
     .firma img {
-      width: 200px;
+      width: 150px;  /* Ajusta el ancho de la imagen de la firma */
       height: auto;
     }
 
@@ -101,18 +101,17 @@
   <div class="certificado">
     <div class="header">
       <div class="logo">
-        <img src="{% static 'img/logo_clinica.png' %}" alt="Logo de la Clínica"> 
+        <img src="{% static 'img/green_cross-0.png' %}" alt="Logo de la Clínica"> 
       </div>
       <div class="info">
         <h2>Clínica SaludSync</h2> 
         <p>Dirección: UNEMI </p> 
         <p>Teléfono: 0944104942</p> 
-        <p>Correo electrónico: JcedenoJ5@unemi.edu.ec </p> 
+        <p>Correo: JcedenoJ5@unemi.edu.ec </p> 
       </div>
     </div>
 
     <h1>CERTIFICADO MÉDICO</h1>
-
     <div class="content">
       <p><strong>ID de Certificado:</strong> {{ certificado.id }}</p>
       <p><strong>Fecha de Emisión:</strong> {{ certificado.fecha_emision|date:"d/m/Y" }}</p>
@@ -123,7 +122,7 @@
 
       <div class="titulo-seccion">Datos del Doctor</div>
       <p><strong>Nombre:</strong> {{ certificado.doctor.nombre_completo }}</p>
-
+      <br><br><br><br>
       <div class="titulo-seccion">Información Médica</div>
       <p><strong>Diagnóstico:</strong>
         {% for diag in certificado.diagnostico.all %}
@@ -132,11 +131,13 @@
       </p>
       <p><strong>Observaciones:</strong> {{ certificado.observaciones }}</p>
     </div>
-
+    <br><br><br><br>
     <div class="firma">
       <img src="{% static 'img/green_cross.ico' %}" alt="Firma del Médico"> 
+      <p>Firma del Doctor</p> 
     </div>
 
+    <br><br><br><br><br>
     <div class="footer">
       <p>Este certificado es válido solo en su formato original.</p>
     </div>
