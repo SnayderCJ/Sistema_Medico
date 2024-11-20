@@ -235,3 +235,17 @@ class ExamenSolicitado(models.Model):
         verbose_name = "Examen Médico"
         verbose_name_plural = "Exámenes Médicos"
 
+class Certificado(models.Model):
+    paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE, verbose_name="Paciente")
+    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE, verbose_name="Doctor")
+
+    fecha_emision = models.DateField(auto_now_add=True, verbose_name="Fecha de Emisión")
+    tipo_certificado = models.CharField(max_length=100, verbose_name="Tipo de Certificado")
+    observaciones = models.TextField(blank=True, verbose_name="Observaciones")
+
+    def __str__(self):
+        return f"Certificado de {self.paciente} - {self.tipo_certificado}"
+
+    class Meta:
+        verbose_name = "Certificado"
+        verbose_name_plural = "Certificados"
