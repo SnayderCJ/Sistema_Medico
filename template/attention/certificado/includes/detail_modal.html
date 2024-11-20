@@ -1,0 +1,43 @@
+<div class="modal fade" id="certificadoModal" tabindex="-1" aria-labelledby="certificadoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary bg-opacity-75">
+                <h5 class="modal-title text-white fw-bold" id="certificadoModalLabel">
+                    <i class="fas fa-certificate me-2"></i>Detalles del Certificado
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <p><strong><i class="fas fa-id-card me-2"></i>ID:</strong> <span id="certificado-id"></span></p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <p><strong><i class="fas fa-user me-2"></i>Paciente:</strong> <span id="certificado-paciente"></span></p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <p><strong><i class="fas fa-user-md me-2"></i>Doctor:</strong> <span id="certificado-doctor"></span></p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <p><strong><i class="fas fa-calendar-alt me-2"></i>Fecha de Emisión:</strong> <span id="certificado-fecha_emision"></span></p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <p><strong><i class="fas fa-cogs me-2"></i>Tipo de Certificado:</strong> <span id="certificado-tipo_certificado"></span></p>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <p><strong><i class="fas fa-file-alt me-2"></i>Observaciones:</strong> <span id="certificado-observaciones"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>            
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

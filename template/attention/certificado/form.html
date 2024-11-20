@@ -1,0 +1,52 @@
+{% extends "components/base.html" %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" href={% static "css/form.css" %}>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12 col-lg-12 px-md-4 main-content">
+            {% include 'includes/message_error_form.html' %}
+            <form method="post" enctype="multipart/form-data" class="py-4">
+                {% csrf_token %}
+                <div class="card shadow p-4">
+                    <h3 class="text-primary mb-4 fw-bold">{{ title1 }}</h3>
+                    <div class="row g-0">
+                        <div class="col-lg-8 px-2">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.paciente.id_for_label }}" class="form-label fw-bold">{{ form.paciente.label }}</label>
+                                    {{ form.paciente }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.doctor.id_for_label }}" class="form-label fw-bold">{{ form.doctor.label }}</label>
+                                    {{ form.doctor }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.fecha_emision.id_for_label }}" class="form-label fw-bold">{{ form.fecha_emision.label }}</label>
+                                    {{ form.fecha_emision }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.tipo_certificado.id_for_label }}" class="form-label fw-bold">{{ form.tipo_certificado.label }}</label>
+                                    {{ form.tipo_certificado }}
+                                </div>
+                                <div class="col-md-12 mb-3">
+                                    <label for="{{ form.observaciones.id_for_label }}" class="form-label fw-bold">{{ form.observaciones.label }}</label>
+                                    {{ form.observaciones }}
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-end mt-4">
+                                <button class="btn btn-outline-success me-2" type="submit">Guardar Certificado</button>
+                                <a class="btn btn-outline-warning" href="{% url 'attention:certificado_list' %}">Cancelar</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
