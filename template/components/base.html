@@ -17,7 +17,6 @@
      <div class="row">
         <!-- Sidebar -->
         <div class="col-md-3 col-lg-2 px-0 sidebar">
-               
             <div class="text-center py-1">
                 <div class="d-flex flex-row justify-content-center align-items-center text-center">
                     <img src="{% static 'img/usuario_anonimo.png' %}" alt="Logo" class="mb-3 rounded-circle" width="100px">
@@ -26,7 +25,7 @@
                 <h5 class="text-white">{{request.user}}</h5>
             </div>
             <nav class="nav flex-column mt-4">
-                <a class="nav-link active" href="/"><i class="fas fa-home me-2"></i> Dashboard</a>
+                <a class="nav-link" href="/"><i class="fas fa-home me-2"></i> Dashboard</a>
                 <a class="nav-link" href="{% url 'attention:citaMedica_list' %}"><i class="fas fa-calendar-alt me-2"></i> Citas</a>
                 <a class="nav-link" href="{% url 'core:patient_list' %}"><i class="fas fa-user-injured me-2"></i> Pacientes</a>
                 <a class="nav-link" href="{% url 'attention:attention_list' %}"><i class="fas fa-procedures me-2"></i> Atencion</a>
@@ -70,7 +69,7 @@
                     <div class="d-flex align-items-center">
                         <div class="dropdown">
                             <button class="btn btn-link dropdown-toggle text-white" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown">
-                                <i class="fas fa-user-md me-2"></i>Dr Daniel Vera
+                                <i class="fas fa-user-md me-2"></i>Dr. {{request.user}}
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Perfil</a></li>
@@ -176,61 +175,74 @@
                     <div class="card h-100">
                         <div class="card-body">
                             <h5 class="card-title mb-4">Actividad Reciente</h5>
+                            
+                            <!-- Último paciente registrado -->
+                            {% if ultimo_paciente %}
                             <div class="activity-item d-flex align-items-center py-3 border-bottom">
                                 <div class="bg-primary text-white p-2 rounded me-3">
                                     <i class="fas fa-user-plus"></i>
                                 </div>
                                 <div>
-                                    <p class="mb-0 fw-bold">Nuevo paciente registrado</p>
-                                    <small class="text-muted">Hace 5 minutos</small>
+                                    <p class="mb-0 fw-bold">Último Paciente Registrado</p>
+                                    <small class="text-muted">{{ ultimo_paciente.nombre_completo|truncatechars:20 }}</small>
+                                    <small class="text-muted d-block">#{{ ultimo_paciente.id }}</small>
                                 </div>
                             </div>
+                            {% endif %}
+
+                            <!-- Última cita registrada -->
+                            {% if ultima_cita_completada %}
                             <div class="activity-item d-flex align-items-center py-3 border-bottom">
                                 <div class="bg-success text-white p-2 rounded me-3">
                                     <i class="fas fa-calendar-check"></i>
                                 </div>
                                 <div>
-                                    <p class="mb-0 fw-bold">Cita completada</p>
-                                    <small class="text-muted">Hace 15 minutos</small>
+                                    <p class="mb-0 fw-bold">Última Cita Completada</p>
+                                    <small class="text-muted">{{ ultima_cita_completada.paciente.nombre_completo|truncatechars:20 }}</small>
+                                    <small class="text-muted d-block">{{ ultima_cita_completada.fecha|date:"d/m/Y" }}</small>
                                 </div>
                             </div>
+                            {% endif %}
+
+                            <!-- Última cita registrada -->
+                            {% if ultima_cita %}
                             <div class="activity-item d-flex align-items-center py-3">
                                 <div class="bg-info text-white p-2 rounded me-3">
                                     <i class="fas fa-file-medical"></i>
                                 </div>
                                 <div>
-                                    <p class="mb-0 fw-bold">Nueva consulta registrada</p>
-                                    <small class="text-muted">Hace 30 minutos</small>
+                                    <p class="mb-0 fw-bold">Nueva Cita Registrada</p>
+                                    <small class="text-muted">{{ ultima_cita.paciente.nombre_completo|truncatechars:20 }}</small>
+                                    <small class="text-muted d-block">{{ ultima_cita.fecha|date:"d/m/Y" }}</small>
                                 </div>
                             </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
+
+
                 <div class="col-md-6 mb-4">
                     <div class="card h-100">
                         <div class="card-body">
                             <h5 class="card-title mb-4">Próximas Citas</h5>
-                            <div class="appointment-item d-flex align-items-center py-3 border-bottom">
-                                <img src="/api/placeholder/48/48" alt="Patient" class="rounded-circle me-3">
+                            {% for cita in proximas_citas %}
+                            <div class="appointment-item d-flex align-items-center py-3 {% if not forloop.last %}border-bottom{% endif %}">
+                              {% if cita.paciente.foto %}
+                              <img src="{{ cita.paciente.foto.url }}" alt="Patient" class="rounded-circle me-3" width="48" height="48"/>
+                              {% else %}
+                              <img src="{% static 'img/usuario_anonimo.png' %}" alt="Patient" class="rounded-circle me-3" width="48" height="48"/>
+                              {% endif %}
                                 <div>
-                                    <p class="mb-0 fw-bold">María García</p>
-                                    <small class="text-muted">Hoy - 10:00 AM</small>
+                                    <p class="mb-0 fw-bold">{{ cita.paciente.nombres }}</p>
+                                    <small class="text-muted">{{ cita.fecha|date:"d/m/Y" }} - {{ cita.hora_cita|time:"H:i A" }}</small>
                                 </div>
                             </div>
-                            <div class="appointment-item d-flex align-items-center py-3 border-bottom">
-                                <img src="/api/placeholder/48/48" alt="Patient" class="rounded-circle me-3">
-                                <div>
-                                    <p class="mb-0 fw-bold">Carlos Rodríguez</p>
-                                    <small class="text-muted">Hoy - 11:30 AM</small>
-                                </div>
-                            </div>
-                            <div class="appointment-item d-flex align-items-center py-3">
-                                <img src="/api/placeholder/48/48" alt="Patient" class="rounded-circle me-3">
-                                <div>
-                                    <p class="mb-0 fw-bold">Ana Martínez</p>
-                                    <small class="text-muted">Hoy - 2:00 PM</small>
-                                </div>
-                            </div>
+                            {% empty %}
+                            <div class="text-center text-muted py-3">
+                                No hay citas programadas
+                              </div>
+                              {% endfor %}
                         </div>
                     </div>
                 </div>
@@ -245,4 +257,19 @@
     <script src="https://cdn.tailwindcss.com"></script>
    {% block js %}{% endblock %}
   </body>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll(".sidebar .nav-link");
+
+        navLinks.forEach(link => {
+            if (link.getAttribute("href") === currentPath) {
+                link.classList.add("active");
+            } else {
+                link.classList.remove("active");
+            }
+        });
+    });
+</script>
 </html>

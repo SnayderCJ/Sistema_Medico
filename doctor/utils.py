@@ -3,7 +3,6 @@ from decimal import Decimal
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.utils import timezone
-from django.db.models import Count, Sum
 
 
 phone_regex = RegexValidator(regex=r'^\d{9,15}$', message="Caracteres inválidos para un número de teléfono.")
@@ -71,7 +70,7 @@ def ip_client_address(request):
     try:
         # case server externo
         client_address = request.META['HTTP_X_FORWARDED_FOR']
-    except:
+    except KeyError:
         # case localhost o 127.0.0.1
         client_address = request.META['REMOTE_ADDR']
 
