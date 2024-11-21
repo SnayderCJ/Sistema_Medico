@@ -1,0 +1,102 @@
+{% extends "components/base.html" %}
+{% block content %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12 col-lg-12 px-md-4 main-content">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="card-title mb-0">Gestión de Pagos</h5>
+                            <a href="{% url 'attention:pago_create' %}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-plus"></i> Nuevo Pago
+                            </a>
+                        </div>
+
+                        <!-- Search and Filter -->
+                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between g-3 mb-4">
+                            <form method="GET" action="{% url 'attention:pago_list' %}" class="d-flex flex-column flex-md-row gap-3 align-items-md-center">
+                                <div class="col-md-20">
+                                    <input type="text" name="q" class="form-control search-box" value="{{ request.GET.q }}" placeholder="Buscar pago por paciente, método o fecha...">
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Payments Table -->
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Paciente</th>
+                                        <th>Método de Pago</th>
+                                        <th>Total Pagado</th>
+                                        <th>Estado</th>
+                                        <th>Fecha de Pago</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for pago in pagos %}
+                                        <tr>
+                                            <td>{{ pago.id }}</td>
+                                            <td>{{ pago.paciente }}</td>
+                                            <td>{{ pago.metodo_pago }}</td>
+                                            <td>${{ pago.calcular_total_pagado }}</td>
+                                            <td>
+                                                {% if pago.pagado %}
+                                                    <span class="badge bg-success">Pagado</span>
+                                                {% else %}
+                                                    <span class="badge bg-danger">Pendiente</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ pago.fecha_pago|date:"d/m/Y" }}</td>
+                                            <td>
+                                                <div class="action-buttons d-flex gap-2">
+                                                    <a href="{% url 'attention:pago_detail' pago.id %}" class="btn btn-info btn-sm" title="Ver Detalles">
+                                                        <i class="fas fa-info-circle"></i>
+                                                    </a>
+                                                    <a href="{% url 'attention:pago_comprobante' pago.id %}" class="btn btn-secondary btn-sm" title="Descargar Comprobante">
+                                                        <i class="fas fa-download"></i>
+                                                    </a>
+                                                    <a href="{% url 'attention:pago_delete' pago.id %}" class="btn btn-danger btn-sm" title="Eliminar Pago">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% empty %}
+                                        <tr>
+                                            <td colspan="7" class="text-center text-muted">No se encontraron pagos.</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <nav class="d-flex justify-content-between align-items-center mt-4">
+                            <p class="text-muted mb-0">{{ page_obj.start_index }} - {{ page_obj.end_index }} de {{ page_obj.paginator.count }} pagos</p>
+                            <ul class="pagination mb-0">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1"><i class="fas fa-chevron-left"></i></a>
+                                    </li>
+                                {% endif %}
+                                {% for num in page_obj.paginator.page_range %}
+                                    <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                    </li>
+                                {% endfor %}
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}"><i class="fas fa-chevron-right"></i></a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

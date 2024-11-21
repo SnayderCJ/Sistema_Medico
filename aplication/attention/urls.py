@@ -6,6 +6,7 @@ from aplication.attention.views.serviciosAdicionales import ServiciosAdicionales
 from aplication.attention.views.examenSolicitado import ExamenSolicitadoCreateView, ExamenSolicitadoListView, ExamenSolicitadoUpdateView, ExamenSolicitadoDeleteView, ExamenSolicitadoDetailView
 from aplication.attention.views.certificado import CertificadoCreateView, CertificadoListView, CertificadoUpdateView, CertificadoDeleteView, CertificadoDetailView, CertificadoPDFView
 from aplication.attention.views.fichaClinica import FichaClinicaListView, FichaClinicaDetailView, ImprimirHistorialClinico
+from aplication.attention.views.pagos import PagoCreateView, PagoListView, PagoDeleteView, PagoDetailView
 
 app_name='attention' # define un espacio de nombre para la aplicacion
 
@@ -57,4 +58,11 @@ urlpatterns = [
   path('fichaClinica_list/', FichaClinicaListView.as_view(), name="fichaClinica_list"),
   path('ficha_clinica_detail/<int:pk>/', FichaClinicaDetailView.as_view(), name='fichaClinica_detail'),
   path('imprimirFichaClinica/<int:pk>/', ImprimirHistorialClinico.as_view(), name='imprimirFichaClinica'),
+  
+  # Pago
+  path('pago_list/',PagoListView.as_view() ,name="pago_list"),
+  path('pago_create/', PagoCreateView.as_view(),name="pago_create"),
+  path('pago_delete/<int:pk>/', PagoDeleteView.as_view(),name='pago_delete'),
+  path('pago_detail/<int:pk>/', PagoDetailView.as_view(),name='pago_detail'),
+  
 ]

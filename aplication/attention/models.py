@@ -240,3 +240,43 @@ class Certificado(models.Model):
     class Meta:
         verbose_name = "Certificado"
         verbose_name_plural = "Certificados"
+
+class Pago(models.Model):
+    paciente = models.ForeignKey(Paciente, on_delete=models.PROTECT, verbose_name="Paciente")
+    costo_atencion = models.OneToOneField(CostosAtencion, on_delete=models.PROTECT, verbose_name="Costo Atención")
+    servicios_adicionales = models.ManyToManyField(ServiciosAdicionales, blank=True, verbose_name="Servicios Adicionales")
+    examenes_medicos = models.ManyToManyField(ExamenSolicitado, blank=True, verbose_name="Examenes Solicitados")
+    monto = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Monto")
+    metodo_pago = models.CharField(max_length=50, choices=[
+        ('Efectivo', 'Efectivo'), 
+        ('PayPal', 'PayPal')
+    ], verbose_name="Método de Pago")
+    pagado = models.BooleanField(default=False, verbose_name="Pagado")
+    fecha_pago = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de Pago")
+
+    def __str__(self):  # Corregir el nombre del método
+        return f"{self.paciente} - {self.costo_atencion} - {self.monto} - {self.metodo_pago}"
+    
+    def calcular_monto_total(self):
+        # Obtener el costo de atención
+        total = self.costo_atencion.costo if self.costo_atencion else 0
+
+        # Sumar los costos de los servicios adicionales
+        for servicio in self.servicios_adicionales.all():
+            total += servicio.costo
+
+        # Sumar los costos de los exámenes médicos
+        for examen in self.examenes_medicos.all():
+            total += examen.costo
+
+        return total
+    
+    def calcular_total(self, costo_atencion, servicios_adicionales, examenes_medicos):
+        total_servicios = sum(servicio.costo_servicio for servicio in servicios_adicionales)
+        total_examenes = sum(examen.precio_examen for examen in examenes_medicos)
+        return costo_atencion.total + total_servicios + total_examenes
+
+    def save(self, *args, **kwargs):
+        # Calcular el monto total automáticamente antes de guardar
+        self.monto = self.calcular_monto_total()
+        super().save(*args, **kwargs)
