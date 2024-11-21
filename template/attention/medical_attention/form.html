@@ -275,7 +275,6 @@
             let nombre=det.medicamento__nombre
             let cantidad= det.cantidad
             let prescripcion=det.prescripcion
-            print( codigo, nombre, cantidad, prescripcion)
             this.medicamentos.push({ codigo, nombre, cantidad, prescripcion });
             });
             this.syncTable();
@@ -382,7 +381,6 @@
             comentarioAdicional: this.comentarioAdicional,
             medicamentos: this.medicamentos
         };
-        console.log(data)
         //alert("Datos enviados...")
         // Enviar los datos al backend usando fetch()
         //let url = (detailAtencionUpdate && detailAtencionUpdate.length > 0) ? '/attention_update/' : '/attention_create/'

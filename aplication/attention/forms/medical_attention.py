@@ -102,7 +102,7 @@ class AttentionForm(ModelForm):
                 'rows': 4,
                 'id': 'id_examen_fisico',
             }),
-            'examenes_enviados': forms.Textarea(attrs={
+            'examenes_enviados': forms.SelectMultiple(attrs={
                 'class': 'form-control shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500',
                 'placeholder': 'Liste los exámenes enviados',
                 'rows': 4,

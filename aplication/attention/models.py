@@ -1,5 +1,5 @@
 from django.db import models
-from aplication.core.models import *
+from aplication.core.models import Paciente, Diagnostico, Medicamento, Doctor
 from doctor.const import CITA_CHOICES, DIA_SEMANA_CHOICES, EXAMEN_CHOICES
 
 # Modelo que representa los días y horas de atención de un doctor.
@@ -121,28 +121,19 @@ class Atencion(models.Model):
 # Modelo que representa el detalle de una atención médica.
 # Relaciona cada atención con los medicamentos recetados y su cantidad.
 class DetalleAtencion(models.Model):
-    # Relación con el modelo CabeceraAtencion, indica a qué atención pertenece este detalle
-    atencion = models.ForeignKey(Atencion, on_delete=models.CASCADE, verbose_name="Cabecera de Atención",related_name="atenciones")
-    # Relación con el modelo Medicamento, indica qué medicamento fue recetado en esta atención
-    medicamento = models.ForeignKey(Medicamento, on_delete=models.CASCADE, verbose_name="Medicamento",related_name="medicamentos")
-   
-    # Cantidad de medicamento recetado
+    atencion = models.ForeignKey(Atencion, on_delete=models.CASCADE, verbose_name="Cabecera de Atención", related_name="atenciones")
+    medicamento = models.ForeignKey(Medicamento, on_delete=models.CASCADE, verbose_name="Medicamento", related_name="medicamentos")
     cantidad = models.PositiveIntegerField(verbose_name="Cantidad")
-    # Prescripción o indicaciones sobre cómo tomar el medicamento
     prescripcion = models.TextField(verbose_name="Prescripción")
-    # Campo adicional: duración del tratamiento con el medicamento (en días)
     duracion_tratamiento = models.PositiveIntegerField(verbose_name="Duración del Tratamiento (días)", null=True, blank=True)
 
     def __str__(self):
         return f"Detalle de {self.medicamento} para {self.atencion}"
 
     class Meta:
-        # Ordena los detalles por cabecera de atención
         ordering = ['atencion']
-        # Nombre singular y plural del modelo en la interfaz administrativa
         verbose_name = "Detalle de Atención"
         verbose_name_plural = "Detalles de Atención"
-
 
 # Modelo que representa un servicio adicional ofrecido durante una atención médica.
 # Puede incluir exámenes, procedimientos, o cualquier otro servicio.

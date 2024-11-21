@@ -101,16 +101,10 @@ class Paciente(models.Model):
         else:
             return '/static/img/usuario_anonimo.png'
 
-     # Método estático para calcular la edad del paciente
-    @staticmethod
-    def calcular_edad(fecha_nacimiento):
-        today = date.today()  # Obtener la fecha actual
-        edad = today.year - fecha_nacimiento.year  # Calcular la diferencia de años
-        # Ajustar la edad si el cumpleaños de este año no ha ocurrido aún
-        if (today.month, today.day) < (fecha_nacimiento.month, fecha_nacimiento.day):
-            edad -= 1  # Restar un año si el cumpleaños no ha pasado
-        return edad  
-    
+    def calcular_edad(self):
+        today = date.today()
+        return today.year - self.fecha_nacimiento.year - ((today.month, today.day) < (self.fecha_nacimiento.month, self.fecha_nacimiento.day))
+
     @staticmethod
     def cantidad_pacientes():
        return Paciente.objects.all().count()
@@ -399,4 +393,3 @@ class AuditUser(models.Model):
         verbose_name = 'Auditoria Usuario '
         verbose_name_plural = 'Auditorias Usuarios'
         ordering = ('-fecha', 'hora')
-        

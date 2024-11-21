@@ -11,7 +11,6 @@ from doctor.utils import save_audit
 from django.template.loader import render_to_string
 from weasyprint import HTML
 
-
     
 class CertificadoListView(LoginRequiredMixin, ListViewMixin, ListView):
     template_name = "attention/certificado/list.html"
@@ -117,14 +116,19 @@ class CertificadoDetailView(LoginRequiredMixin, DetailView):
     
 class CertificadoPDFView(LoginRequiredMixin, DetailView):
     model = Certificado
-    template_name = 'attention/certificado/pdf_template.html'  # Plantilla HTML del PDF
+    template_name = 'attention/certificado/pdf_template.html'  
     context_object_name = 'certificado'
     
     def get(self, request, *args, **kwargs):
         certificado = self.get_object()
+        
+        # Pasar la ruta absoluta al contexto
+        context = {
+            'certificado': certificado,
+        }
 
         # Renderizar el HTML que será convertido a PDF
-        html_content = render_to_string(self.template_name, {'certificado': certificado})
+        html_content = render_to_string(self.template_name, context)
         
         # Generar el PDF
         pdf = HTML(string=html_content).write_pdf()

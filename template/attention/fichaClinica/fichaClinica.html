@@ -1,0 +1,37 @@
+<h1>Ficha Clínica</h1>
+
+<h2>Datos del Paciente</h2>
+<p><strong>Nombre:</strong> {{ paciente.nombres }} {{ paciente.apellidos }}</p>
+<p><strong>Cédula:</strong> {{ paciente.cedula }}</p>
+<p><strong>Fecha de Nacimiento:</strong> {{ paciente.fecha_nacimiento }}</p>
+<p><strong>Edad:</strong> {{ edad }} años</p>
+<p><strong>Género:</strong> {{ paciente.get_sexo_display }}</p>
+<p><strong>Teléfono:</strong> {{ paciente.telefono }}</p>
+<p><strong>Correo:</strong> {{ paciente.email }}</p>
+<p><strong>Dirección:</strong> {{ paciente.direccion }}</p>
+
+<h2>Historial Médico</h2>
+<p><strong>Alergias:</strong> {{ paciente.alergias }}</p>
+<p><strong>Enfermedades Crónicas:</strong> {{ paciente.enfermedades_cronicas }}</p>
+<p><strong>Medicamentos Actuales:</strong> {{ paciente.medicacion_actual }}</p>
+<p><strong>Cirugías Previas:</strong> {{ paciente.cirugias_previas }}</p>
+<p><strong>Antecedentes Personales:</strong> {{ paciente.antecedentes_personales }}</p>
+<p><strong>Antecedentes Familiares:</strong> {{ paciente.antecedentes_familiares }}</p>
+
+<h2>Medicamentos Recetados</h2>
+<ul>
+  {% for detalle in medicamentos %}
+  <li>{{ detalle.medicamento.nombre }} - Cantidad: {{ detalle.cantidad }} - Prescripción: {{ detalle.prescripcion }}</li>
+  {% empty %}
+  <li>No hay medicamentos recetados.</li>
+  {% endfor %}
+</ul>
+
+<h2>Certificados Médicos</h2>
+<ul>
+  {% for certificado in certificados %}
+  <li>Fecha: {{ certificado.fecha_emision }} - Días de reposo: {{ certificado.dias_reposo }}</li>
+  {% empty %}
+  <li>No hay certificados médicos.</li>
+  {% endfor %}
+</ul>
