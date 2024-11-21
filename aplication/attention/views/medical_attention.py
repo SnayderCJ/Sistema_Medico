@@ -4,14 +4,14 @@ import json
 from django.urls import reverse_lazy
 from django.db import transaction
 from aplication.attention.forms.medical_attention import AttentionForm
-from aplication.attention.models import Atencion, DetalleAtencion
+from aplication.attention.models import Atencion, DetalleAtencion, ExamenSolicitado
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import CreateView, ListView, UpdateView, DeleteView, DetailView
+from django.views.generic import CreateView, ListView, UpdateView, DetailView
 from django.http import JsonResponse
 from django.contrib import messages
 from django.db.models import Q
 from aplication.core.models import Diagnostico, Medicamento
-from doctor.mixins import CreateViewMixin, DeleteViewMixin, ListViewMixin, UpdateViewMixin
+from doctor.mixins import CreateViewMixin, ListViewMixin, UpdateViewMixin
 from doctor.utils import custom_serializer, save_audit
 
 class AttentionListView(LoginRequiredMixin,ListViewMixin,ListView):
@@ -39,14 +39,7 @@ class AttentionCreateView(LoginRequiredMixin,CreateViewMixin, CreateView):
     success_url = reverse_lazy('attention:attention_list')
     # permission_required = 'add_supplier' # en PermissionMixn se verfica si un grupo tiene el permiso
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data()
-        context['detail_atencion'] =[]
-        context["medications"] = Medicamento.active_medication.order_by('nombre')
-        
-        return context
-    
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         # Convertir el cuerpo de la solicitud a un diccionario Python
         data = json.loads(request.body)
         medicamentos = data['medicamentos']  
@@ -54,8 +47,7 @@ class AttentionCreateView(LoginRequiredMixin,CreateViewMixin, CreateView):
         try:
             with transaction.atomic():
                 # Crear la instancia del modelo Atencion
-                print("entro atencion")
-                atencion=Atencion.objects.create(
+                atencion = Atencion.objects.create(
                     paciente_id=int(data['paciente']),
                     presion_arterial=data['presionArterial'],
                     pulso=int(data['pulso']),
@@ -68,16 +60,20 @@ class AttentionCreateView(LoginRequiredMixin,CreateViewMixin, CreateView):
                     sintomas=data['sintomas'],
                     tratamiento=data['tratamiento'],
                     examen_fisico=data['examenFisico'],
-                    examenes_enviados=data['examenesEnviados'],
                     comentario_adicional=data['comentarioAdicional'],
                     fecha_atencion= timezone.now()
                 )
                 diagnostico_ids = data.get('diagnostico', [])
                 diagnosticos = Diagnostico.objects.filter(id__in=diagnostico_ids)
                 atencion.diagnostico.set(diagnosticos)
+                
+                examenes_ids = data.get('examenesEnviados', [])
+                examenes = ExamenSolicitado.objects.filter(id__in=examenes_ids)
+                atencion.examenes_enviados.set(examenes)
+                
                 atencion.save()
+                
                 # Ahora procesamos el arreglo de medicamentos
-                print("voy a medicamentos")
                 for medicamento in medicamentos:
                     #Crear el detalle de atención para cada medicamento
                     DetalleAtencion.objects.create(
@@ -93,7 +89,7 @@ class AttentionCreateView(LoginRequiredMixin,CreateViewMixin, CreateView):
                 return JsonResponse({"msg": "Éxito al registrar la atención médica."}, status=200)
 
         except Exception as ex:
-            messages.error(self.request, f"Érro al registrar la atención médica")
+            messages.error(self.request, "Érro al registrar la atención médica")
             return JsonResponse({"msg": str(ex)}, status=400)
         
       
@@ -106,73 +102,64 @@ class AttentionUpdateView(LoginRequiredMixin,UpdateViewMixin,UpdateView):
     # permission_required = 'add_supplier' # en PermissionMixn se verfica si un grupo tiene el permiso
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data()
-        # Obtiene una lista de medicamentos activos usando un método del modelo Medicamento.
-        # Extrae solo los campos 'id' y 'nombre', y los ordena alfabéticamente por 'nombre'
+        context = super().get_context_data(**kwargs)
         context["medications"] = Medicamento.active_medication.values('id','nombre').order_by('nombre')
-        # Obtiene una lista de detalles de atención relacionados con la atención actual (self.object.id)
-        # Filtra por el ID de la atención y selecciona los campos 'medicamento_id', 'medicamento_nombre',
-        # 'cantidad' y 'prescripcion' para optimizar la consulta
-        detail_atencion =list(DetalleAtencion.objects.filter(atencion_id=self.object.id).values("medicamento_id","medicamento__nombre","cantidad","prescripcion"))
-        # Convierte la lista de diccionarios en una cadena JSON para que pueda ser usada en JavaScript.
-        # Utiliza un serializador personalizado 'custom_serializer' para manejar tipos de datos especiales
-        detail_atencion=json.dumps(detail_atencion,default=custom_serializer)
-        # Agrega los detalles de la atención al contexto con la clave 'detail_atencion'
-        # El resultado será un string JSON como: '[{"id": 1, "nombre": "aspirina"}, {...}, {...}]'
-        context['detail_atencion']=detail_atencion 
+        detail_atencion = list(DetalleAtencion.objects.filter(atencion_id=self.object.id).values("medicamento_id","medicamento__nombre","cantidad","prescripcion"))
+        detail_atencion = json.dumps(detail_atencion, default=custom_serializer)
+        context['detail_atencion'] = detail_atencion 
+        context['examenes'] = ExamenSolicitado.objects.all()
         return context
     
     def post(self, request, *args, **kwargs):
-        # Convertir el cuerpo de la solicitud a un diccionario Python
         data = json.loads(request.body)
         medicamentos = data['medicamentos']  
-        print(medicamentos)
         try:
-             atencion = Atencion.objects.get(id=self.kwargs.get('pk'))
-             with transaction.atomic():
-                # Crear la instancia del modelo Atencion
-                atencion.paciente_id=int(data['paciente'])
-                atencion.presion_arterial=data['presionArterial']
-                atencion.pulso=int(data['pulso'])
-                atencion.temperatura=Decimal(data['temperatura'])
-                atencion.frecuencia_respiratoria=int(data['frecuenciaRespiratoria'])
-                atencion.saturacion_oxigeno=Decimal(data['saturacionOxigeno'])
-                atencion.peso=Decimal(data['peso'])
-                atencion.altura=Decimal(data['altura'])
-                atencion.motivo_consulta=data['motivoConsulta']
-                atencion.sintomas=data['sintomas']
-                atencion.tratamiento=data['tratamiento']
-                atencion.examen_fisico=data['examenFisico']
-                atencion.examenes_enviados=data['examenesEnviados']
-                atencion.comentario_adicional=data['comentarioAdicional']
+            atencion = Atencion.objects.get(id=self.kwargs.get('pk'))
+            with transaction.atomic():
+                atencion.paciente_id = int(data['paciente'])
+                atencion.presion_arterial = data['presionArterial']
+                atencion.pulso = int(data['pulso'])
+                atencion.temperatura = Decimal(data['temperatura'])
+                atencion.frecuencia_respiratoria = int(data['frecuenciaRespiratoria'])
+                atencion.saturacion_oxigeno = Decimal(data['saturacionOxigeno'])
+                atencion.peso = Decimal(data['peso'])
+                atencion.altura = Decimal(data['altura'])
+                atencion.motivo_consulta = data['motivoConsulta']
+                atencion.sintomas = data['sintomas']
+                atencion.tratamiento = data['tratamiento']
+                atencion.examen_fisico = data['examenFisico']
+                atencion.comentario_adicional = data['comentarioAdicional']
+                
                 diagnostico_ids = data.get('diagnostico', [])
                 diagnosticos = Diagnostico.objects.filter(id__in=diagnostico_ids)
                 atencion.diagnostico.set(diagnosticos)
+                
+                examenes_ids = data.get('examenesEnviados', [])
+                examenes = ExamenSolicitado.objects.filter(id__in=examenes_ids)
+                atencion.examenes_enviados.set(examenes)
+                
                 atencion.save()
-                # borrar el detalle asociado a esa atencion
+                
                 DetalleAtencion.objects.filter(atencion_id=atencion.id).delete()
-                # Ahora procesamos el arreglo de medicamentos
                 for medicamento in medicamentos:
-                    #Crear el detalle de atención para cada medicamento
                     DetalleAtencion.objects.create(
                         atencion=atencion,
                         medicamento_id=int(medicamento['codigo']),
                         cantidad=int(medicamento['cantidad']),
                         prescripcion=medicamento['prescripcion'],
-                        # Si necesitas la duración del tratamiento, puedes agregarla aquí
                     )
                 
                 save_audit(request, atencion, "M")
                 messages.success(self.request, f"Éxito al Actualizar la atención médica #{atencion.id}")
                 return JsonResponse({"msg": "Éxito al Actualizar la atención médica."}, status=200)
         except Exception as ex:
-            messages.error(self.request, f"Érro al actualizar la atención médica")
+            messages.error(self.request, "Érro al actualizar la atención médica")
             return JsonResponse({"msg": str(ex)}, status=400)
         
 class AttentionDetailView(LoginRequiredMixin,DetailView):
     model = Atencion
     
-    def get(self, request, *args, **kwargs):
+    def get(self):
         atencion = self.get_object()
         detail_atencion =list(DetalleAtencion.objects.filter(atencion_id=atencion.id).values("medicamento_id","medicamento__nombre","cantidad","prescripcion"))
         detail_atencion=json.dumps(detail_atencion,default=custom_serializer)

@@ -91,7 +91,7 @@ class Atencion(models.Model):
     # Detalle del examen físico realizado
     examen_fisico = models.TextField(null=True, blank=True, verbose_name="Examen Físico")
     # Detalle de  examenes a enviar
-    examenes_enviados = models.TextField(null=True, blank=True, verbose_name="Examenes enviados")
+    examenes_enviados = models.ManyToManyField('ExamenSolicitado', blank=True, verbose_name="Exámenes Enviados")
     # Comentarios adicionales del doctor sobre la atención o el estado del paciente
     comentario_adicional = models.TextField(null=True, blank=True, verbose_name="Comentario")
 
