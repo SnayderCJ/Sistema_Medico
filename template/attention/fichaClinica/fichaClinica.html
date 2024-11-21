@@ -30,7 +30,7 @@
 <h2>Certificados Médicos</h2>
 <ul>
   {% for certificado in certificados %}
-  <li>Fecha: {{ certificado.fecha_emision }} - Días de reposo: {{ certificado.dias_reposo }}</li>
+  <li>Fecha: {{ certificado.fecha_emision }} - Observaaciones: {{ certificado.observaciones }}</li>
   {% empty %}
   <li>No hay certificados médicos.</li>
   {% endfor %}

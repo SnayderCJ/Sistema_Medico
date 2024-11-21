@@ -80,11 +80,17 @@ class ImprimirHistorialClinico(View):
     def get(self, request, pk):
         paciente = Paciente.objects.get(pk=pk)
         atenciones = Atencion.objects.filter(paciente=paciente).order_by('-fecha_atencion')
+        medicamentos = DetalleAtencion.objects.filter(atencion__paciente=paciente)
+        certificados = Certificado.objects.filter(paciente=paciente)
+
 
         # Contexto para la plantilla HTML
         context = {
             'paciente': paciente,
             'atenciones': atenciones,
+            'medicamentos': medicamentos,
+            'certificados': certificados,
+            'edad': FichaClinicaDetailView().calcular_edad(paciente.fecha_nacimiento)
         }
 
         # Renderizar el HTML
