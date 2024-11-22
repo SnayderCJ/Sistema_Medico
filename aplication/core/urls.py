@@ -11,7 +11,7 @@ from aplication.core.views.marcaMedicamento import MarcaMedicamentoListView, Mar
 from aplication.core.views.medicamento import MedicamentoListView, MedicamentoCreateView, MedicamentoUpdateView, MedicamentoDeleteView, MedicamentoDetailView 
 from aplication.core.views.diagnostico import DiagnosticoListView, DiagnosticoCreateView, DiagnosticoUpdateView, DiagnosticoDeleteView, DiagnosticoDetailView
 from aplication.core.views.auditUser import AuditUserListView
- 
+from aplication.core.views.estadistica import  VistaEstadisticas
  
  
 app_name='core' # define un espacio de nombre para la aplicacion
@@ -90,4 +90,7 @@ urlpatterns = [
   
   # Auditoria
   path('auditoria/', AuditUserListView.as_view(), name='audit-list'),
+  
+  # Estadisticas 
+  path("estadisticas/", VistaEstadisticas.as_view(), name="estadisicas"),
 ]

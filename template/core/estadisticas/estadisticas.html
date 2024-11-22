@@ -1,0 +1,155 @@
+{% extends "components/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-2xl font-bold text-gray-900 mb-6 text-center">{{ title }}</h1>
+
+        <div class="grid grid-cols-2 gap-4 sm:grid-cols-4 mb-6">
+            <div class="bg-blue-500 rounded-lg shadow-sm p-4">
+                <h2 class="text-sm font-semibold text-white mb-1">Total Pacientes</h2>
+                <p class="text-2xl font-bold text-white">{{ total_pacientes }}</p>
+            </div>
+            <div class="bg-green-500 rounded-lg shadow-sm p-4">
+                <h2 class="text-sm font-semibold text-white mb-1">Total Citas</h2>
+                <p class="text-2xl font-bold text-white">{{ total_citas }}</p>
+            </div>
+            <div class="bg-yellow-500 rounded-lg shadow-sm p-4">
+                <h2 class="text-sm font-semibold text-white mb-1">Tasa Finalización</h2>
+                <p class="text-2xl font-bold text-white">{{ tasa_finalizacion }}%</p>
+            </div>
+            <div class="bg-red-500 rounded-lg shadow-sm p-4">
+                <h2 class="text-sm font-semibold text-white mb-1">Edad Promedio</h2>
+                <p class="text-2xl font-bold text-white">{{ edad_promedio }} años</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 mb-6">
+            <div class="bg-white rounded-lg shadow-sm p-4">
+                <h2 class="text-sm font-semibold text-gray-800 mb-2">Citas Mensuales {{ año_actual }}</h2>
+                <div class="h-48">
+                    <canvas id="citasMensuales"></canvas>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm p-4">
+                <h2 class="text-sm font-semibold text-gray-800 mb-2">Pacientes por Género</h2>
+                <div class="h-48">
+                    <canvas id="pacientesPorGenero"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div class="bg-white rounded-lg shadow-sm p-4">
+                <h2 class="text-sm font-semibold text-gray-800 mb-2">Citas por Día</h2>
+                <div class="h-48">
+                    <canvas id="citasPorDia"></canvas>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm p-4">
+                <h2 class="text-sm font-semibold text-gray-800 mb-2">Medicamentos más Recetados</h2>
+                <div class="h-48">
+                    <canvas id="medicamentosRecetados"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extrajs %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        }
+    };
+
+    // Citas Mensuales
+    new Chart(document.getElementById('citasMensuales'), {
+        type: 'line',
+        data: {
+            labels: {{ citas_mensuales|safe|stringformat:"s" }}.map(item => {
+                const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+                return meses[item.mes - 1];
+            }),
+            datasets: [{
+                label: 'Citas',
+                data: {{ citas_mensuales|safe|stringformat:"s" }}.map(item => item.total),
+                borderColor: 'rgb(59, 130, 246)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            ...commonOptions,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Pacientes por Género
+    new Chart(document.getElementById('pacientesPorGenero'), {
+        type: 'doughnut',
+        data: {
+            labels: {{ pacientes_por_genero|safe|stringformat:"s" }}.map(item => item.sexo),
+            datasets: [{
+                data: {{ pacientes_por_genero|safe|stringformat:"s" }}.map(item => item.total),
+                backgroundColor: ['#F472B6', '#60A5FA']
+            }]
+        },
+        options: commonOptions
+    });
+
+    // Citas por Día
+    new Chart(document.getElementById('citasPorDia'), {
+        type: 'bar',
+        data: {
+            labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+            datasets: [{
+                label: 'Citas',
+                data: {{ citas_por_dia|safe|stringformat:"s" }}.map(item => item.total),
+                backgroundColor: 'rgba(59, 130, 246, 0.5)'
+            }]
+        },
+        options: {
+            ...commonOptions,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Medicamentos Recetados
+    new Chart(document.getElementById('medicamentosRecetados'), {
+        type: 'bar',
+        data: {
+            labels: {{ medicamentos_mas_recetados|safe|stringformat:"s" }}.map(item => item.medicamento__nombre),
+            datasets: [{
+                label: 'Cantidad Recetada',
+                data: {{ medicamentos_mas_recetados|safe|stringformat:"s" }}.map(item => item.total_recetado),
+                backgroundColor: 'rgba(16, 185, 129, 0.5)'
+            }]
+        },
+        options: {
+            ...commonOptions,
+            indexAxis: 'y',
+            scales: {
+                x: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}
