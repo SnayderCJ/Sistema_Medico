@@ -23,5 +23,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('aplication.core.urls',namespace='core')),
     path('', include('aplication.attention.urls',namespace='attention')),
-    
+    path('', include('aplication.security.urls',namespace='security'))   
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) # configuracion imagenes

@@ -1,3 +1,8 @@
 from django.contrib import admin
+from aplication.security.models import GroupModulePermission, Menu, Module, User
 
-# Register your models here.
+
+admin.site.register(Menu)
+admin.site.register(User)
+admin.site.register(Module)
+admin.site.register(GroupModulePermission)
