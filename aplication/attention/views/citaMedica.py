@@ -11,7 +11,6 @@ from doctor.utils import save_audit
 from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
-from datetime import timedelta
 
 class CitaMedicaListView(LoginRequiredMixin,ListViewMixin,ListView):
     template_name = "attention/citaMedica/list.html"
@@ -21,12 +20,21 @@ class CitaMedicaListView(LoginRequiredMixin,ListViewMixin,ListView):
     paginate_by = 10
     
     def get_queryset(self):
-        self.query = Q()
-        q1 = self.request.GET.get('q') # ver
+        query = Q()
         
-        if q1 is not None: 
-            self.query.add(Q(fecha__icontains=q1), Q.AND)   
-        return self.model.objects.filter(self.query).order_by('fecha')
+        # Obtén los parámetros de búsqueda y filtro
+        q = self.request.GET.get('q')
+        estado = self.request.GET.get('estado')
+
+        # Filtrar por nombre completo del paciente si 'q' está presente
+        if q:
+            query &= (Q(paciente__nombres__icontains=q) | Q(paciente__apellidos__icontains=q))
+
+        # Filtrar por estado si 'estado' está presente
+        if estado:
+            query &= Q(estado=estado)
+        
+        return CitaMedica.objects.filter(query).order_by('fecha')
     
 class CitaMedicaCreateView(LoginRequiredMixin, CreateViewMixin, CreateView):
     model = CitaMedica

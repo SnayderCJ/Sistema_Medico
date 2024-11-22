@@ -17,13 +17,21 @@
                    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between g-3 mb-4">
                     <form method="GET" action="{% url 'attention:citaMedica_list' %}" class="d-flex flex-column flex-md-row gap-3 align-items-md-center">
                         <div class="col-md-6">
-                            <input type="text" name="q" class="form-control search-box"   value="{{ request.GET.q }}" placeholder="Buscar paciente...">
+                            <input type="text" name="q" class="form-control search-box" value="{{ request.GET.q }}" placeholder="Buscar paciente...">
                         </div>
-                      </form>
-                      <a class="btn btn-primary mt-3 mt-md-0" href="{% url 'attention:citaMedica_create' %}">
-                                <i class="fas fa-plus me-2"></i>Nuevo Cita
-                      </a>
-                    </div>
+                        <div class="col-md-6">
+                            <select class="form-select" name="estado">
+                                <option value="">Todos</option>
+                                <option value="P" {% if request.GET.estado == 'P' %}selected{% endif %}>Programada</option>
+                                <option value="C" {% if request.GET.estado == 'C' %}selected{% endif %}>Cancelada</option>
+                                <option value="R" {% if request.GET.estado == 'R' %}selected{% endif %}>Realizada</option>
+                            </select>
+                        </div>
+                    </form>
+                    <a class="btn btn-primary fw-bold  mt-3 mt-md-0" href="{% url 'attention:citaMedica_create' %}">
+                        <i class="fas fa-plus me-2"></i>Nueva Cita
+                    </a>
+                </div>
 
                     <!-- Patient Table -->
                     <div class="table-responsive">
@@ -53,13 +61,11 @@
                                     <td>{{item.hora_cita}}</td>
                                     <td>
                                         {% if item.estado == 'P' %}
-                                            <span class="text-primary fw-bold">Programada</span>
+                                            <span class="badge bg-info">Programada</span>
                                         {% elif item.estado == 'C' %}
-                                            <span class="text-danger fw-bold">Cancelada</span>
+                                            <span class="badge bg-danger">Cancelada</span>
                                         {% elif item.estado == 'R' %}
-                                            <span class="text-success fw-bold">Realizada</span>
-                                        {% else %}
-                                            <span class="text-muted">Desconocido</span>
+                                            <span class="badge bg-success">Realizada</span>
                                         {% endif %}
                                     </td>
                                     <td>

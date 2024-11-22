@@ -27,7 +27,6 @@ class PagoListView(LoginRequiredMixin, ListViewMixin, ListView):
     model = Pago
     context_object_name = 'pagos'
 
-
 class PagoCreateView(LoginRequiredMixin, CreateViewMixin, CreateView):
     model = Pago
     template_name = 'attention/pago/form.html'
@@ -55,17 +54,18 @@ class PagoCreateView(LoginRequiredMixin, CreateViewMixin, CreateView):
             return self.process_cash_payment(form)
 
     def process_cash_payment(self, form):
-        with transaction.atomic():
-            pago = form.save(commit=False)
-            pago.pagado = True
-            pago.save()
-            form.save_m2m()
+        try:
+            with transaction.atomic():
+                pago = form.save()  # Guardar el pago directamente
 
-            for examen in form.cleaned_data['examenes_medicos']:
-                examen.pagado = True
-                examen.save()
+                # Actualizar el campo pagado de los exámenes médicos
+                examenes_medicos = form.cleaned_data['examenes_medicos']
+                examenes_medicos.update(pagado=True)  # Actualizar en una sola consulta
 
-        messages.success(self.request, "El pago en efectivo se ha registrado correctamente.")
+            messages.success(self.request, "El pago en efectivo se ha registrado correctamente.")
+        except Exception as e:
+            messages.error(self.request, f"Error al registrar el pago: {e}")
+
         return redirect(self.success_url)
 
     def process_paypal_payment(self, form, total):
@@ -123,7 +123,6 @@ class PagoCreateView(LoginRequiredMixin, CreateViewMixin, CreateView):
             messages.error(self.request, "Hubo un problema al procesar el pago con PayPal. Inténtalo de nuevo.")
             return redirect(self.success_url)
 
-
 def paypal_execute(request):
     payment_id = request.GET.get('paymentId')
     payer_id = request.GET.get('PayerID')
@@ -134,20 +133,23 @@ def paypal_execute(request):
             costo_atencion_id = request.GET.get('costo_atencion_id')
             costo_atencion = get_object_or_404(CostosAtencion, pk=costo_atencion_id)
 
-            pago = Pago.objects.create(
-                paciente=costo_atencion.atencion.paciente,
-                costo_atencion=costo_atencion,
-                metodo_pago='PayPal',
-                pagado=True
-            )
+            with transaction.atomic():
+                pago = Pago.objects.create(
+                    paciente=costo_atencion.atencion.paciente,
+                    costo_atencion=costo_atencion,
+                    metodo_pago='PayPal',
+                    pagado=True
+                )
 
-            servicios_adicionales_ids = request.session.pop('servicios_adicionales', [])
-            examenes_medicos_ids = request.session.pop('examenes_medicos', [])
-            pago.servicios_adicionales.set(servicios_adicionales_ids)
-            pago.examenes_medicos.set(examenes_medicos_ids)
+                servicios_adicionales_ids = request.session.pop('servicios_adicionales', [])
+                examenes_medicos_ids = request.session.pop('examenes_medicos', [])
+                servicios_adicionales = ServiciosAdicionales.objects.filter(pk__in=servicios_adicionales_ids)
+                examenes_medicos = ExamenSolicitado.objects.filter(pk__in=examenes_medicos_ids)
+                pago.servicios_adicionales.set(servicios_adicionales)
+                pago.examenes_medicos.set(examenes_medicos)
 
-            costo_atencion.pagado = True
-            costo_atencion.save()
+                costo_atencion.pagado = True
+                costo_atencion.save()
 
             messages.success(request, "El pago con PayPal se ha procesado correctamente.")
             return redirect('attention:pago_list')
@@ -157,7 +159,6 @@ def paypal_execute(request):
         print(f"Error en PayPal: {e}")
         messages.error(request, "Hubo un problema al confirmar el pago.")
         return redirect('attention:pago_list')
-
 
 class PagoDetailView(LoginRequiredMixin, DetailView):
     model = Pago
@@ -169,18 +170,20 @@ class PagoDetailView(LoginRequiredMixin, DetailView):
         context['total_pagado'] = self.object.calcular_total_pagado()
         return context
 
-
 class PagoDeleteView(LoginRequiredMixin, DeleteViewMixin, DeleteView):
     model = Pago
     template_name = 'attention/pago/confirm_delete.html'
     success_url = reverse_lazy('attention:pago_list')
 
     def delete(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        self.object.delete()
-        messages.success(request, "El pago ha sido eliminado correctamente.")
+        try:
+            with transaction.atomic():
+                self.object = self.get_object()
+                self.object.delete()
+            messages.success(request, "El pago ha sido eliminado correctamente.")
+        except Exception as e:
+            messages.error(request, f"Error al eliminar el pago: {e}")
         return redirect(self.success_url)
-
 
 class PagoComprobanteView(View):
     def get(self, request, *args, **kwargs):
@@ -199,12 +202,10 @@ class PagoComprobanteView(View):
         response['Content-Disposition'] = f'attachment; filename="comprobante_pago_{pago.pk}.pdf"'
         return response
 
-
 def verificar_pago_paciente(request):
     paciente_id = request.GET.get('paciente_id')
     ha_pagado = Pago.objects.filter(paciente_id=paciente_id, pagado=True).exists()
     return JsonResponse({'ha_pagado': ha_pagado})
-
 
 def obtener_examenes_paciente(request):
     paciente_id = request.GET.get('paciente_id')

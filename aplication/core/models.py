@@ -138,7 +138,7 @@ class Doctor(models.Model):
     # Apellido del doctor
     apellidos = models.CharField(max_length=100, verbose_name="Apellidos")
     # Cédula de identidad única del doctor
-    cedula = models.CharField(max_length=10, unique=True, verbose_name="Cédula")
+    cedula = models.CharField(max_length=10, unique=True, verbose_name="Cédula", validators=[valida_cedula])
     # Fecha de nacimiento del doctor
     fecha_nacimiento = models.DateField(verbose_name="Fecha de Nacimiento")
     # Direccion del doctor
@@ -222,7 +222,7 @@ class Empleado(models.Model):
     # Apellido del empleado
     apellidos = models.CharField(max_length=100, verbose_name="Apellido del Empleado")
     # Cédula de identidad única del empleado
-    cedula = models.CharField(max_length=10, unique=True, verbose_name="Cédula")
+    cedula = models.CharField(max_length=10, unique=True, verbose_name="Cédula", validators=[valida_cedula])
     # Fecha de nacimiento del empleado
     fecha_nacimiento = models.DateField(verbose_name="Fecha de Nacimiento")
     # Relación con el modelo Cargo, permite asociar un cargo específico al empleado

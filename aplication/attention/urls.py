@@ -6,7 +6,7 @@ from aplication.attention.views.serviciosAdicionales import ServiciosAdicionales
 from aplication.attention.views.examenSolicitado import ExamenSolicitadoCreateView, ExamenSolicitadoListView, ExamenSolicitadoUpdateView, ExamenSolicitadoDeleteView, ExamenSolicitadoDetailView
 from aplication.attention.views.certificado import CertificadoCreateView, CertificadoListView, CertificadoUpdateView, CertificadoDeleteView, CertificadoDetailView, CertificadoPDFView
 from aplication.attention.views.fichaClinica import FichaClinicaListView, FichaClinicaDetailView, ImprimirHistorialClinico
-from aplication.attention.views.pagos import PagoCreateView, PagoListView, PagoDeleteView, PagoDetailView
+from aplication.attention.views.pagos import PagoListView, PagoCreateView ,PagoDeleteView, PagoDetailView, PagoComprobanteView, paypal_execute, verificar_pago_paciente,obtener_examenes_paciente
 
 app_name='attention' # define un espacio de nombre para la aplicacion
 
@@ -60,9 +60,13 @@ urlpatterns = [
   path('imprimirFichaClinica/<int:pk>/', ImprimirHistorialClinico.as_view(), name='imprimirFichaClinica'),
   
   # Pago
-  path('pago_list/',PagoListView.as_view() ,name="pago_list"),
-  path('pago_create/', PagoCreateView.as_view(),name="pago_create"),
-  path('pago_delete/<int:pk>/', PagoDeleteView.as_view(),name='pago_delete'),
-  path('pago_detail/<int:pk>/', PagoDetailView.as_view(),name='pago_detail'),
+  path('pago_list/', PagoListView.as_view(), name="pago_list"),
+  path('pago_create/', PagoCreateView.as_view(), name="pago_create"),
+  path('pago_delete/<int:pk>/', PagoDeleteView.as_view(), name='pago_delete'),
+  path('pago_detail/<int:pk>/', PagoDetailView.as_view(), name='pago_detail'),
+  path('pago_comprobante/<int:pk>/', PagoComprobanteView.as_view(), name='pago_comprobante'),
+  path('paypal_execute/', paypal_execute, name='paypal_execute'),
+  path('verificar_pago_paciente/', verificar_pago_paciente, name='verificar_pago_paciente'),
+  path('obtener_examenes_paciente/', obtener_examenes_paciente, name='obtener_examenes_paciente'),
   
 ]
