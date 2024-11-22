@@ -20,23 +20,23 @@
             <div class="text-center py-1">
                 <div class="d-flex flex-row justify-content-center align-items-center text-center">
                     <img src="{% static 'img/usuario_anonimo.png' %}" alt="Logo" class="mb-3 rounded-circle" width="100px">
-                  
                 </div>
                 <h5 class="text-white">{{request.user}}</h5>
             </div>
             <nav class="nav flex-column mt-4">
                 <a class="nav-link" href="/"><i class="fas fa-home me-2"></i> Dashboard</a>
-                <a class="nav-link" href="{% url 'attention:citaMedica_list' %}"><i class="fas fa-calendar-alt me-2"></i> Citas</a>
-                <a class="nav-link" href="{% url 'core:patient_list' %}"><i class="fas fa-user-injured me-2"></i> Pacientes</a>
-                <a class="nav-link" href="{% url 'attention:attention_list' %}"><i class="fas fa-procedures me-2"></i> Atencion</a>
-                <a class="nav-link" href="{% url 'attention:fichaClinica_list' %}"><i class="fas fa-procedures me-2"></i>Ficha Clinica</a>
-                <a class="nav-link" href="{% url 'attention:pago_list' %}"><i class="fas fa-stethoscope me-2"></i>Pagos</a>
-                <a class="nav-link" href="{% url 'attention:examen_list' %}"><i class="fas fa-stethoscope me-2"></i>Examenes</a>
-
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="{% url 'attention:citaMedica_list' %}"><i class="fas fa-calendar-alt me-2 " aria-hidden="true"></i> Citas</a>
+                <a class="nav-link" href="{% url 'core:patient_list' %}"><i class="fas fa-user-injured me-2" aria-hidden="true"></i> Pacientes</a>
+                <a class="nav-link" href="{% url 'attention:attention_list' %}"><i class="fas fa-procedures me-2" aria-hidden="true"></i> Atencion</a>
+                <a class="nav-link" href="{% url 'attention:fichaClinica_list' %}"><i class="fas fa-procedures me-2" aria-hidden="true"></i> Ficha Clinica</a>
+                <a class="nav-link" href="{% url 'attention:pago_list' %}"><i class="fas fa-stethoscope me-2" aria-hidden="true"></i> Pagos</a>
+                <a class="nav-link" href="{% url 'attention:examen_list' %}"><i class="fas fa-stethoscope me-2" aria-hidden="true"></i> Examenes</a>
+        
+                <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#mantenimientoMenu" aria-expanded="false" aria-controls="mantenimientoMenu">
                     <i class="fas fa-tools me-2"></i> Mantenimiento
+                    <i class="fas fa-caret-down ms-2"></i> <!-- Ícono de flecha -->
                 </a>
-                <div>
+                <div class="collapse" id="mantenimientoMenu">
                     <a class="nav-link" href="{% url 'core:especialidad_list' %}"><i class="fas fa-user-md me-2"></i> Especialidad </a>
                     <a class="nav-link" href="{% url 'core:doctor_list' %}"><i class="fas fa-user-nurse me-2"></i> Doctor </a>
                     <a class="nav-link" href="{% url 'attention:horario_list' %}"><i class="fas fa-clock me-2"></i> Horarios</a>
@@ -52,8 +52,6 @@
                     <a class="nav-link" href="{% url 'core:tipoSangre_list' %}"><i class="fas fa-tint me-2"></i> Tipo Sangre </a>
                     <a class="nav-link" href="{% url 'core:audit-list' %}"><i class="fas fa-clipboard-list me-2"></i> Auditoria </a>
                 </div>
-               
-                            
             </nav>
         </div>
         
@@ -73,8 +71,15 @@
                                 <i class="fas fa-user-md me-2"></i>Dr. {{request.user}}
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Perfil</a></li>
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i>Salir</a></li>
+                                <li><a class="dropdown-item" href="{% url 'security:auth_profile' %}"><i class="fas fa-user me-2"></i>Perfil</a></li>
+                                <li>
+                                    <form method="POST" action="{% url 'security:auth_logout' %}" style="display: inline;">
+                                      {% csrf_token %}
+                                      <button type="submit" class="dropdown-item" style="background: none; border: none;">
+                                        <i class="fas fa-sign-out-alt me-2"></i>Salir
+                                      </button>
+                                    </form>
+                                  </li>
                             </ul>
                         </div>
                     </div>
@@ -267,19 +272,15 @@
    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCx1t2u2KcArNV3hvHCAfOHVLf66uhFLII&callback=initMap"></script>
    {% block js %}{% endblock %}
   </body>
-
+  <footer class="text-center py-3 bg-light mt-auto">
+    <p class="mb-0"> © 2024 SnayderC. Todos los derechos reservados.</p>
+    <small>Desarrollado por D's - xSnazzyC </small>
+    </footer>
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const currentPath = window.location.pathname;
-        const navLinks = document.querySelectorAll(".sidebar .nav-link");
-
-        navLinks.forEach(link => {
-            if (link.getAttribute("href") === currentPath) {
-                link.classList.add("active");
-            } else {
-                link.classList.remove("active");
-            }
-        });
+    document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+        if (link.href === window.location.href) {
+            link.classList.add('active');
+        }
     });
 </script>
 </html>

@@ -1,0 +1,57 @@
+{% extends "components/base.html" %}
+
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12 col-lg-12 px-md-4 main-content">
+      <div class="card mb-4">
+        <div class="card-body">
+          <h1 class="text-center mb-4">{{ title2 }}</h1>
+
+          {% if error %}
+          <div class="alert alert-danger" role="alert">
+            {{ error }}
+          </div>
+          {% endif %}
+
+          {% if success_messages %}
+          <div class="alert alert-success" role="alert">
+            <ul>
+              {% for message in success_messages %}
+                <li>{{ message }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+
+          <form method="post">
+            {% csrf_token %}
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <!-- Cambiar 'username' por 'email' si usas correo electrónico como campo de inicio de sesión -->
+                <label for="{{ form.username.id_for_label }}" class="form-label">Correo electrónico:</label>
+                {{ form.username|add_class:"form-control" }}  <!-- 'form.username' se mantiene si usas correo como nombre de usuario -->
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="{{ form.password.id_for_label }}" class="form-label">Contraseña:</label>
+                {{ form.password|add_class:"form-control" }}
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-sign-in-alt"></i> Iniciar sesión
+              </button>
+              <a href="{% url 'security:auth_signup' %}" class="btn btn-secondary">
+                <i class="fas fa-user-plus"></i> Registrarse
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

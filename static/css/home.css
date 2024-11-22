@@ -59,3 +59,22 @@
   transform: scale(1.05);
 }
     
+footer {
+  background: linear-gradient(45deg, #54635a, #2e302f);
+  color: #ecf0f1;
+  padding: 20px 0;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+}
+
+footer p, footer small {
+  margin: 0;
+}
+
+
+
+.stat-card.bg-success {
+  background: linear-gradient(45deg, #2ecc71, #27ae60);
+}
+.stat-card.bg-danger {
+  background: linear-gradient(45deg, #e74c3c, #c0392b);
+}

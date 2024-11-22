@@ -115,7 +115,7 @@ class PermissionMixin(object):
         'A ocurrido un error al ingresar al modulo, error para el admin es : {}'.format(ex))
 
     if request.user.is_authenticated:
-      return redirect('home')
+      return redirect('core:home')
 
     return redirect('security:auth_login')
 

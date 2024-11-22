@@ -8,6 +8,11 @@ from django.db import models
 from django.forms import ImageField, FileInput
 from django.contrib.auth.forms import PasswordChangeForm
 from doctor.utils import valida_cedula
+from django.contrib.auth import get_user_model
+
+class CustomAuthenticationForm(forms.Form):
+    username = forms.EmailField(label="Correo electrónico", widget=forms.EmailInput(attrs={'autofocus': True}))
+    password = forms.CharField(label="Contraseña", widget=forms.PasswordInput)
 
 class CustomUserCreationForm(UserCreationForm):
   dni = forms.CharField(max_length=10, label="DNI", validators=[valida_cedula])

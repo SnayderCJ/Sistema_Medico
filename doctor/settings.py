@@ -84,6 +84,11 @@ TEMPLATES = [
 WSGI_APPLICATION = 'doctor.wsgi.application'
 
 
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',  # Este es el backend por defecto
+)
+
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
@@ -139,10 +144,20 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)#carpeta fisica de archivo
 MEDIA_ROOT = os.path.join(BASE_DIR,'media') # carpeta fisica de archivos de Imagenes
 MEDIA_URL = '/media/' # 
 
+AUTH_USER_MODEL = 'security.User'
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Usar base de datos para sesiones
+SESSION_COOKIE_AGE = 3600
+
 # Login 
-LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/login/'
+LOGIN_URL = 'security:auth_login'  # O la URL que hayas configurado para el login
+
+# Si un usuario intenta acceder a una página que requiere autenticación
+# y no está autenticado, lo redirigirá a la página de login.
+LOGIN_REDIRECT_URL = 'security:modules_list'  
+
+# Si la autenticación se realiza correctamente, usa esta URL para redirigir:
+LOGOUT_REDIRECT_URL = 'core:home'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

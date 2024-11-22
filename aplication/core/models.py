@@ -3,6 +3,7 @@ from django.db import models
 from doctor.const import CIVIL_CHOICES, SEX_CHOICES
 from django.contrib.auth.models import User
 from doctor.utils import valida_cedula,phone_regex
+from django.conf import settings
 
       
 """Modelo que representa los diferentes tipos de sangre.
@@ -378,7 +379,7 @@ class AuditUser(models.Model):
         ('M', 'M'),   # Modificacion
         ('E', 'E')    # Eliminacion
     )
-    usuario = models.ForeignKey(User, verbose_name='Usuario',on_delete=models.PROTECT)
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     tabla = models.CharField(max_length=100, verbose_name='Tabla')
     registroid = models.IntegerField(verbose_name='Registro Id')
     accion = models.CharField(choices=TIPOS_ACCIONES, max_length=10, verbose_name='Accion')

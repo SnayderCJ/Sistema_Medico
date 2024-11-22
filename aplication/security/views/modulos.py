@@ -98,7 +98,7 @@ class ModuleDeleteView(PermissionMixin, DeleteViewMixin, DeleteView):
     if self.object.groupmodulepermission_set.exists():
       # Mostrar mensaje de error
       messages.error(request, "No se puede eliminar el módulo porque tiene relaciones con otros objetos.")
-      return redirect(reverse('security:modules_list'))
+      return redirect(self.success_url)
 
     # Eliminación física del objeto Module
     success_url = self.get_success_url()

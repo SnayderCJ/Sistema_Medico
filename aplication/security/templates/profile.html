@@ -1,0 +1,43 @@
+{% extends "components/base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12 col-lg-12 px-md-4 main-content">
+      <div class="card mb-4">
+        <div class="card-body">
+          <h1 class="text-center mb-4">{{ title2 }}</h1> 
+
+          <div class="row">
+            <div class="col-md-4 text-center">
+              <img src="{{ user.get_image }}" alt="Foto de perfil" class="img-fluid rounded-circle mb-3" style="max-width: 200px;">
+            </div>
+            <div class="col-md-8">
+              <p><strong>Nombre de usuario:</strong> {{ user.username }}</p>
+              <p><strong>Nombre completo:</strong> {{ user.get_full_name }}</p>
+              <p><strong>Email:</strong> {{ user.email }}</p>
+              <p><strong>DNI:</strong> {{ user.dni }}</p>
+              <p><strong>Dirección:</strong> {{ user.direction }}</p>
+              <p><strong>Teléfono:</strong> {{ user.phone }}</p>
+              <p><strong>Grupos:</strong> 
+                {% for group in user.get_groups %}
+                  {{ group.name }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+              </p>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <a href="{% url 'security:auth_update_profile' %}" class="btn btn-primary">
+              <i class="fas fa-edit"></i> Editar perfil
+            </a>
+            <a href="{% url 'security:auth_change_password' %}" class="btn btn-secondary">
+              <i class="fas fa-key"></i> Cambiar contraseña
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
