@@ -144,6 +144,9 @@ class User(AbstractUser):
   email = models.EmailField('Email', unique=True)
   direction = models.CharField('Direccion', max_length=200, blank=True, null=True)
   phone = models.CharField('Telefono', max_length=50, blank=True, null=True)
+  
+  groups = models.ManyToManyField(Group, related_name='security_users')  # Agregar related_name
+  user_permissions = models.ManyToManyField(Permission, related_name='security_users')  # Agregar related_name
 
   USERNAME_FIELD = "email"  # cambia el login
   REQUIRED_FIELDS = ["username", "first_name", "last_name"]
@@ -206,24 +209,3 @@ class User(AbstractUser):
       return '/static/img/usuario_anonimo.png'
 
 
-class AuditUser(models.Model):
-  TIPOS_ACCIONES = (
-    ('A', 'A'),  # Adicion
-    ('M', 'M'),  # Modificacion
-    ('E', 'E')  # Eliminacion
-  )
-  usuario = models.ForeignKey(User, verbose_name='Usuario', on_delete=models.PROTECT)
-  tabla = models.CharField(max_length=100, verbose_name='Tabla')
-  registroid = models.IntegerField(verbose_name='Registro Id')
-  accion = models.CharField(choices=TIPOS_ACCIONES, max_length=10, verbose_name='Accion')
-  fecha = models.DateField(verbose_name='Fecha')
-  hora = models.TimeField(verbose_name='Hora')
-  estacion = models.CharField(max_length=100, verbose_name='Estacion')
-
-  def __str__(self):
-    return "{} - {} [{}]".format(self.usuario.username, self.tabla, self.accion)
-
-  class Meta:
-    verbose_name = 'Auditoria Usuario '
-    verbose_name_plural = 'Auditorias Usuarios'
-    ordering = ('-fecha', 'hora')
