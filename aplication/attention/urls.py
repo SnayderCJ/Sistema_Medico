@@ -6,7 +6,7 @@ from aplication.attention.views.serviciosAdicionales import ServiciosAdicionales
 from aplication.attention.views.examenSolicitado import ExamenSolicitadoCreateView, ExamenSolicitadoListView, ExamenSolicitadoUpdateView, ExamenSolicitadoDeleteView, ExamenSolicitadoDetailView
 from aplication.attention.views.certificado import CertificadoCreateView, CertificadoListView, CertificadoUpdateView, CertificadoDeleteView, CertificadoDetailView, CertificadoPDFView
 from aplication.attention.views.fichaClinica import FichaClinicaListView, FichaClinicaDetailView, ImprimirHistorialClinico
-from aplication.attention.views.costo_pago import PagoCreateView, PagoDetailView, PagoListView, PagoDeleteView, PagoComprobanteView, paypal_execute, verificar_pago_paciente, obtener_examenes_paciente
+from aplication.attention.views.costo_pago import PagoCreateView, PagoDetailView, PagoListView, PagoDeleteView, PagoComprobanteView, paypal_execute, verificar_pago_paciente, obtener_examenes_paciente, obtener_costos_completos_paciente
 
 app_name = 'attention'
 
@@ -67,6 +67,7 @@ urlpatterns = [
   path('pago_comprobante/<int:pk>/', PagoComprobanteView.as_view(), name='pago_comprobante'),
   path('paypal_execute/', paypal_execute, name='paypal_execute'),
   path('verificar_pago_paciente/', verificar_pago_paciente, name='verificar_pago_paciente'),
+  path('obtener_costos_completos_paciente/', obtener_costos_completos_paciente, name='obtener_costos_completos_paciente'),
   path('obtener_examenes_paciente/', obtener_examenes_paciente, name='obtener_examenes_paciente'),
   
 ]

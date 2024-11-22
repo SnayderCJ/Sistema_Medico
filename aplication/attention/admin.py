@@ -5,7 +5,6 @@ from aplication.attention.models import (
     Atencion,
     DetalleAtencion,
     ServiciosAdicionales,
-    CostosAtencion,
     CostoAtencionDetalle,
     ExamenSolicitado,
     Pago,
@@ -51,7 +50,7 @@ class ServiciosAdicionalesAdmin(admin.ModelAdmin):
 # Admin para CostoAtencionDetalle
 @admin.register(CostoAtencionDetalle)
 class CostoAtencionDetalleAdmin(admin.ModelAdmin):
-    list_display = ('costo_atencion', 'servicios_adicionales')  # Elimina 'costo_servicio'
+    list_display = ('costo_atencion', 'servicios_adicionales') 
     search_fields = ('costo_atencion__atencion__paciente__nombre', 'servicios_adicionales__nombre_servicio')
 
 # Admin para ExamenSolicitado

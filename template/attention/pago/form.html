@@ -78,23 +78,17 @@
                         <div class="row g-4 mb-2">
                             <div class="col-md-6">
                                 <div class="form-floating">
-                                    {{ form.servicios_adicionales }}
-                                    <label for="{{ form.servicios_adicionales.id_for_label }}">{{ form.servicios_adicionales.label }}</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    {{ form.examenes_medicos }}
-                                    <label for="{{ form.examenes_medicos.id_for_label }}">{{ form.examenes_medicos.label }}</label>
+                                    {{ form.metodo_pago }}
+                                    <label for="{{ form.metodo_pago.id_for_label }}">{{ form.metodo_pago.label }}</label>
                                 </div>
                             </div>
                         </div>
 
                         <div class="row g-4 mb-2">
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <div class="form-floating">
-                                    {{ form.metodo_pago }}
-                                    <label for="{{ form.metodo_pago.id_for_label }}">{{ form.metodo_pago.label }}</label>
+                                    {{ form.costos }}
+                                    <label for="{{ form.costos.id_for_label }}">{{ form.costos.label }}</label>
                                 </div>
                             </div>
                         </div>
@@ -111,4 +105,39 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const pacienteSelect = document.getElementById('{{ form.paciente.id_for_label }}');
+        const costosTextarea = document.getElementById('{{ form.costos.id_for_label }}');
+    
+        pacienteSelect.addEventListener('change', function() {
+            const pacienteId = this.value;
+            if (pacienteId) {
+                fetch(`/obtener_costos_completos_paciente/?paciente_id=${pacienteId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            costosTextarea.value = data.error;
+                        } else {
+                            let detalles = '';
+                            detalles += `Costos Atención: $${parseFloat(data.costos_atencion).toFixed(2)}\n`;
+                            detalles += `Servicios Adicionales: $${parseFloat(data.servicios_adicionales).toFixed(2)}\n`;
+                            detalles += `Exámenes: $${parseFloat(data.examenes).toFixed(2)}\n`;
+                            detalles += `Medicinas: $${parseFloat(data.medicinas).toFixed(2)}\n\n`;
+                            detalles += `Total General: $${parseFloat(data.total_general).toFixed(2)}`;
+                            costosTextarea.value = detalles;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al obtener los costos:', error);
+                        costosTextarea.value = 'Error al obtener los costos';
+                    });
+            } else {
+                costosTextarea.value = '';
+            }
+        });
+    });
+</script>
+
 {% endblock %}
