@@ -1,61 +1,73 @@
 {% extends "components/base.html" %}
 
 {% load static %}
-{% block css%}
-    <script src="https://cdn.tailwindcss.com"></script>
+{% block css %}
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          animation: {
+            'bounce-slow': 'bounce 3s linear infinite',
+          }
+        }
+      }
+    }
+  </script>
 {% endblock %}
 {% load widget_tweaks %}
 
 {% block content %}
-<div class="container-fluid">
-  <div class="row">
-    <div class="col-md-12 col-lg-12 px-md-4 main-content">
-      <div class="card mb-4">
-        <div class="card-body">
-          <h1 class="text-center mb-4">{{ title2 }}</h1>
-
-          {% if error %}
-          <div class="alert alert-danger" role="alert">
-            {{ error }}
-          </div>
-          {% endif %}
-
-          {% if success_messages %}
-          <div class="alert alert-success" role="alert">
-            <ul>
-              {% for message in success_messages %}
-                <li>{{ message }}</li>
-              {% endfor %}
-            </ul>
-          </div>
-          {% endif %}
-
-          <form method="post">
-            {% csrf_token %}
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <!-- Cambiar 'username' por 'email' si usas correo electrónico como campo de inicio de sesión -->
-                <label for="{{ form.username.id_for_label }}" class="form-label">Correo electrónico:</label>
-                {{ form.username|add_class:"form-control" }}  <!-- 'form.username' se mantiene si usas correo como nombre de usuario -->
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="{{ form.password.id_for_label }}" class="form-label">Contraseña:</label>
-                {{ form.password|add_class:"form-control" }}
-              </div>
-            </div>
-
-            <div class="mt-4">
-              <button type="submit" class="btn btn-primary">
-                <i class="fas fa-sign-in-alt"></i> Iniciar sesión
-              </button>
-              <a href="{% url 'security:auth_signup' %}" class="btn btn-secondary">
-                <i class="fas fa-user-plus"></i> Registrarse
-              </a>
-            </div>
-          </form>
-        </div>
-      </div>
+<div class="min-h-screen bg-gradient-to-br from-blue-100 via-white to-purple-100 py-6 flex flex-col justify-center sm:py-12">
+  <div class="relative py-3 sm:max-w-2xl sm:mx-auto"> <!-- Cambiado de sm:max-w-xl a sm:max-w-2xl -->
+  <div class="absolute inset-0 bg-gradient-to-r from-blue-300 to-blue-600 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl transition-all duration-300 ease-in-out hover:rotate-0 hover:scale-105"></div>
+  <div class="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20 transition-all duration-300 ease-in-out hover:shadow-2xl">
+    <div class="max-w-lg mx-auto">
+    <div>
+      <h1 class="text-2xl font-semibold text-center text-gray-900 mb-4">{{ title2 }}</h1>
+      <p class="text-center text-gray-600 animate-bounce-slow">¡Bienvenido de vuelta!</p>
     </div>
+    
+    {% if error %}
+    <div class="mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative animate-pulse" role="alert">
+      {{ error }}
+    </div>
+    {% endif %}
+
+    {% if success_messages %}
+    <div class="mt-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative animate-pulse" role="alert">
+      <ul class="list-disc list-inside">
+      {% for message in success_messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    <form class="mt-8 space-y-6 transform transition-all duration-300 ease-in-out hover:scale-102" method="post">
+      {% csrf_token %}
+      <div class="space-y-6">
+      <div class="group">
+        <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors duration-200">Correo electrónico:</label>
+        {{ form.username|add_class:"mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all duration-200 ease-in-out transform group-hover:scale-105" }}
+      </div>
+      <div class="group">
+        <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors duration-200">Contraseña:</label>
+        {{ form.password|add_class:"mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all duration-200 ease-in-out transform group-hover:scale-105" }}
+      </div>
+      </div>
+
+      <div class="flex flex-col items-center justify-between mt-8 space-y-4">
+      <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-all duration-300 ease-in-out transform hover:scale-110 hover:rotate-1">
+        <i class="fas fa-sign-in-alt mr-2"></i>Iniciar sesión
+      </button>
+      <a href="{% url 'security:auth_signup' %}" class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800 transition-all duration-300 ease-in-out transform hover:scale-110 hover:-rotate-1">
+        <i class="fas fa-user-plus mr-2"></i>Registrarse
+      </a>
+      </div>
+    </form>
+    </div>
+  </div>
   </div>
 </div>
 {% endblock %}
