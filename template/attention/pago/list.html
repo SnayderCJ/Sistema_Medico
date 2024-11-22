@@ -53,15 +53,20 @@
                                     <td>{{ pago.fecha_pago|date:"d/m/Y" }}</td>
                                     <td>
                                         <div class="action-buttons d-flex gap-2">
-                                            <a href="{% url 'attention:pago_detail' pago.id %}" class="btn btn-info btn-sm" title="Ver Detalles">
-                                                <i class="fas fa-info-circle"></i>
+                                            <a href="{% url 'attention:pago_update' pago.id %}" class="btn btn-info btn-sm" title="Editar Pago">
+                                                <i class="fas fa-edit"></i>
                                             </a>
                                             <a href="{% url 'attention:pago_comprobante' pago.id %}" class="btn btn-secondary btn-sm" title="Descargar Comprobante">
                                                 <i class="fas fa-download"></i>
                                             </a>
-                                            <a href="{% url 'attention:pago_delete' pago.id %}" class="btn btn-danger btn-sm" title="Eliminar Pago">
+                                            <button type="button" class="btn btn-danger btn-sm" title="Eliminar Pago" onclick="confirmDelete('{{ pago.id }}', '{{ pago.paciente.nombre_completo }}')">
                                                 <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                            {% if not pago.pagado %}
+                                            <a href="{% url 'attention:paypal_execute' %}?paymentId={{ pago.id }}" class="btn btn-primary btn-sm" title="Pagar con PayPal">
+                                                <i class="fab fa-paypal"></i> Pagar con PayPal
                                             </a>
+                                            {% endif %}
                                         </div>
                                     </td>
                                 </tr>
@@ -99,4 +104,41 @@
         </div>
     </div>
 </div>
+
+<!-- Modal de confirmación de eliminación -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="modalMessage">¿Estás seguro de que deseas eliminar este pago?</p>
+            </div>
+            <div class="modal-footer">
+                <form id="deleteForm" method="POST" action="">
+                    {% csrf_token %}
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function confirmDelete(id, name) {
+        // Actualiza el mensaje del modal
+        document.getElementById('modalMessage').innerText = `¿Estás seguro de que deseas eliminar el pago de ${name}?`;
+
+        // Actualiza la acción del formulario
+        const form = document.getElementById('deleteForm');
+        form.action = `/pago_delete/${id}/`; // Ajusta la URL según tu configuración
+
+        // Muestra el modal
+        const modal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+        modal.show();
+    }
+</script>
 {% endblock %}

@@ -29,7 +29,7 @@ class AttentionListView(LoginRequiredMixin,ListViewMixin,ListView):
             self.query.add(Q(paciente__nombres__icontains=q1), Q.OR) 
             self.query.add(Q(paciente__apellidos__icontains=q1), Q.OR) 
             self.query.add(Q(paciente__cedula__icontains=q1), Q.OR) 
-        if sex == "M" or sex=="F": self.query.add(Q(paciente__sexo__icontains=sex), Q.AND)   
+        if sex == "M" or sex=="F" : self.query.add(Q(paciente__sexo__icontains=sex), Q.AND)   
         return self.model.objects.filter(self.query).order_by('-fecha_atencion')
     
 class AttentionCreateView(LoginRequiredMixin,CreateViewMixin, CreateView):
@@ -103,8 +103,8 @@ class AttentionUpdateView(LoginRequiredMixin,UpdateViewMixin,UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["medications"] = Medicamento.active_medication.values('id','nombre').order_by('nombre')
-        detail_atencion = list(DetalleAtencion.objects.filter(atencion_id=self.object.id).values("medicamento_id","medicamento__nombre","cantidad","prescripcion"))
+        context["medications"] = Medicamento.objects.filter(activo=True).values('id', 'nombre').order_by('nombre')
+        detail_atencion = list(DetalleAtencion.objects.filter(atencion_id=self.object.id).values("medicamento_id", "medicamento__nombre", "cantidad", "prescripcion"))
         detail_atencion = json.dumps(detail_atencion, default=custom_serializer)
         context['detail_atencion'] = detail_atencion 
         context['examenes'] = ExamenSolicitado.objects.all()
