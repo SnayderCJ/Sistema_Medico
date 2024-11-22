@@ -218,20 +218,14 @@ def enviar_notificacion_cita(cita, asunto, mensaje):
     )
 
 def enviar_recordatorios():
-    hoy = timezone.now().date()  # Obtener la fecha de hoy
+    manana = (timezone.now() + timezone.timedelta(days=1)).date()  # Obtener la fecha de mañana
 
-    citas_proximamente = CitaMedica.objects.filter(
-        fecha__gte=hoy,  # Filtrar citas con fecha mayor o igual a hoy
-        estado='P'       # 'P' para Programada
+    citas_manana = CitaMedica.objects.filter(
+        fecha=manana,      # Filtrar citas con fecha igual a mañana
+        estado='P'         # 'P' para Programada
     )
-    for cita in citas_proximamente:
-        dias_hasta_cita = (cita.fecha - hoy).days  # Calcular los días hasta la cita
-
-        if dias_hasta_cita == 0:
-            asunto = 'Recordatorio de cita médica (hoy)'
-            mensaje = f'Estimado(a) {cita.paciente.nombre_completo},\n\nLe recordamos que tiene una cita médica con el Dr. {cita.doctor.nombre_completo} hoy a las {cita.hora_cita}.\n\nAtentamente,\nClínica SaludSync'
-        else:
-            asunto = f'Recordatorio de cita médica (en {dias_hasta_cita} días)'
-            mensaje = f'Estimado(a) {cita.paciente.nombre_completo},\n\nLe recordamos que tiene una cita médica con el Dr. {cita.doctor.nombre_completo} el {cita.fecha} a las {cita.hora_cita}.\n\nAtentamente,\nClínica SaludSync'
+    for cita in citas_manana:
+        asunto = 'Recordatorio de cita médica (mañana)'
+        mensaje = f'Estimado(a) {cita.paciente.nombre_completo},\n\nLe recordamos que tiene una cita médica con el Dr. {cita.doctor.nombre_completo} mañana a las {cita.hora_cita}.\n\nAtentamente,\nClínica SaludSync'
 
         enviar_notificacion_cita(cita, asunto, mensaje)
