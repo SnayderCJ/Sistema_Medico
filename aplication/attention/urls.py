@@ -6,9 +6,9 @@ from aplication.attention.views.serviciosAdicionales import ServiciosAdicionales
 from aplication.attention.views.examenSolicitado import ExamenSolicitadoCreateView, ExamenSolicitadoListView, ExamenSolicitadoUpdateView, ExamenSolicitadoDeleteView, ExamenSolicitadoDetailView
 from aplication.attention.views.certificado import CertificadoCreateView, CertificadoListView, CertificadoUpdateView, CertificadoDeleteView, CertificadoDetailView, CertificadoPDFView
 from aplication.attention.views.fichaClinica import FichaClinicaListView, FichaClinicaDetailView, ImprimirHistorialClinico
-from aplication.attention.views.pagos import PagoListView, PagoCreateView ,PagoDeleteView, PagoDetailView, PagoComprobanteView, paypal_execute, verificar_pago_paciente,obtener_examenes_paciente
+from aplication.attention.views.costo_pago import PagoCreateView, PagoDetailView, PagoListView, PagoDeleteView, PagoComprobanteView, paypal_execute, verificar_pago_paciente, obtener_examenes_paciente
 
-app_name='attention' # define un espacio de nombre para la aplicacion
+app_name = 'attention'
 
 urlpatterns = [
   # rutas de atenciones

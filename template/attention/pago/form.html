@@ -1,46 +1,113 @@
 {% extends "components/base.html" %}
+{% load static %}
+{% block css %}
+<style>
+    .form-floating > label {
+        padding: 0.5rem 0.75rem;
+    }
+    .form-floating > .form-control,
+    .form-floating > .form-select {
+        height: 3.5rem;
+        line-height: 1.25;
+    }
+    .form-floating > textarea.form-control {
+        height: auto;
+        min-height: 100px;
+    }
+    .card {
+        border-radius: 15px;
+        border: none;
+    }
+    .section-title {
+        color: #2563eb;
+        font-size: 1.1rem;
+        font-weight: 500;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e5e7eb;
+    }
+    .btn-primary {
+        background-color: #2563eb;
+        border-color: #2563eb;
+        padding: 0.625rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+    }
+    .btn-primary:hover {
+        background-color: #1d4ed8;
+        border-color: #1d4ed8;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-12 col-lg-12 px-md-4 main-content">
-            {% include 'includes/message_error_form.html' %}
-            <form method="post" enctype="multipart/form-data" class="py-4">
-                {% csrf_token %}
-                <div class="card shadow p-4">
-                    <h3 class="text-primary mb-4 fw-bold">{{ title1 }}</h3>
-                    <div class="row g-0">
-                        <div class="col-lg-8 px-2">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.paciente.id_for_label }}" class="form-label fw-bold">{{ form.paciente.label }}</label>
+<title>{% block title %}Registrar Pago{% endblock title %}</title>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 col-xxl-10">
+            <h3 class="text-center mb-2 fw-bold text-primary-emphasis shadow">
+                Registrar Pago  
+            </h3>
+            
+            <div class="card shadow">
+                <div class="card-body p-2 p-md-3">
+                    <form id="frmPago" method="POST">
+                        {% csrf_token %}
+                        {{ form.media }}
+                        
+                        <div class="row g-4 mb-2">
+                            <div class="col-md-6">
+                                <div class="form-floating">
                                     {{ form.paciente }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.costo_atencion.id_for_label }}" class="form-label fw-bold">{{ form.costo_atencion.label }}</label>
-                                    {{ form.costo_atencion }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.servicios_adicionales.id_for_label }}" class="form-label fw-bold">{{ form.servicios_adicionales.label }}</label>
-                                    {{ form.servicios_adicionales }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.examenes_medicos.id_for_label }}" class="form-label fw-bold">{{ form.examenes_medicos.label }}</label>
-                                    {{ form.examenes_medicos }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.metodo_pago.id_for_label }}" class="form-label fw-bold">{{ form.metodo_pago.label }}</label>
-                                    {{ form.metodo_pago }}
+                                    <label for="{{ form.paciente.id_for_label }}">{{ form.paciente.label }}</label>
                                 </div>
                             </div>
-                            <div class="d-flex justify-content-end mt-4">
-                                <button class="btn btn-outline-success me-2" type="submit">Realizar Pago</button>
-                                <a class="btn btn-outline-warning" href="{% url 'attention:pago_list' %}">Cancelar</a>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form.costo_atencion }}
+                                    <label for="{{ form.costo_atencion.id_for_label }}">{{ form.costo_atencion.label }}</label>
+                                </div>
                             </div>
                         </div>
-                    </div>
+
+                        <div class="row g-4 mb-2">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form.servicios_adicionales }}
+                                    <label for="{{ form.servicios_adicionales.id_for_label }}">{{ form.servicios_adicionales.label }}</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form.examenes_medicos }}
+                                    <label for="{{ form.examenes_medicos.id_for_label }}">{{ form.examenes_medicos.label }}</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-4 mb-2">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form.metodo_pago }}
+                                    <label for="{{ form.metodo_pago.id_for_label }}">{{ form.metodo_pago.label }}</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end mt-4 gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Guardar
+                            </button>
+                            <a class="btn btn-success" href="{% url 'attention:pago_list' %}">Cancelar</a>
+                        </div>
+                    </form>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>

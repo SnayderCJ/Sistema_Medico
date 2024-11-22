@@ -1,14 +1,19 @@
-from django.core.mail import EmailMessage
+import paypalrestsdk
 from io import BytesIO
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, DetailView, DeleteView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from doctor.mixins import ListViewMixin, CreateViewMixin, UpdateViewMixin, DeleteViewMixin
-from aplication.attention.models import Pago, CostosAtencion, ServiciosAdicionales, ExamenSolicitado
+from doctor.mixins import ListViewMixin, CreateViewMixin, DeleteViewMixin
+from aplication.attention.models import (
+    Pago, 
+    CostosAtencion, 
+    ServiciosAdicionales, 
+    ExamenSolicitado,
+    CostoAtencionDetalle, 
+)
 from aplication.attention.forms.pago import PagoForm
-import paypalrestsdk
 from django.http import HttpResponse, JsonResponse
 from django.template.loader import get_template
 from weasyprint import HTML
@@ -41,88 +46,28 @@ class PagoCreateView(LoginRequiredMixin, CreateViewMixin, CreateView):
             messages.warning(self.request, "El paciente ya tiene un pago registrado para esta atención.")
             return redirect(self.success_url)
 
-        metodo_pago = form.cleaned_data['metodo_pago']
-        costo_atencion = form.cleaned_data['costo_atencion']
-        servicios_adicionales = form.cleaned_data['servicios_adicionales']
-        examenes_medicos = form.cleaned_data['examenes_medicos']
+        with transaction.atomic():
+            pago = form.save(commit=False) 
+            pago.monto = pago.costo_atencion.total  # Obtener el total de CostosAtencion
+            pago.save()
 
-        total = Pago().calcular_total(costo_atencion, servicios_adicionales, examenes_medicos)
+            # Guardar servicios adicionales en CostoAtencionDetalle
+            for servicio in form.cleaned_data['servicios_adicionales']:
+                CostoAtencionDetalle.objects.create(
+                    costo_atencion=pago.costo_atencion,
+                    servicios_adicionales=servicio,
+                )
 
-        if metodo_pago == 'PayPal':
-            return self.process_paypal_payment(form, total)
-        else:
-            return self.process_cash_payment(form)
+            # Si necesitas guardar los exámenes en CostoAtencionDetalle:
+            for examen in form.cleaned_data['examenes_medicos']:
+                CostoAtencionDetalle.objects.create(
+                    costo_atencion=pago.costo_atencion,
+                    examen_solicitado=examen,  # Asumiendo que agregaste un campo 'examen_solicitado' en CostoAtencionDetalle
+                )
 
-    def process_cash_payment(self, form):
-        try:
-            with transaction.atomic():
-                pago = form.save()  # Guardar el pago directamente
-
-                # Actualizar el campo pagado de los exámenes médicos
-                examenes_medicos = form.cleaned_data['examenes_medicos']
-                examenes_medicos.update(pagado=True)  # Actualizar en una sola consulta
-
-            messages.success(self.request, "El pago en efectivo se ha registrado correctamente.")
-        except Exception as e:
-            messages.error(self.request, f"Error al registrar el pago: {e}")
-
+            messages.success(self.request, "El pago se ha registrado correctamente.")
         return redirect(self.success_url)
-
-    def process_paypal_payment(self, form, total):
-        items = [{
-            "name": "Costo Atención",
-            "sku": "001",
-            "price": str(form.cleaned_data['costo_atencion'].total),
-            "currency": "USD",
-            "quantity": 1
-        }]
-
-        for servicio in form.cleaned_data['servicios_adicionales']:
-            items.append({
-                "name": servicio.nombre_servicio,
-                "sku": f"servicio_{servicio.id}",
-                "price": str(servicio.costo_servicio),
-                "currency": "USD",
-                "quantity": 1
-            })
-
-        for examen in form.cleaned_data['examenes_medicos']:
-            items.append({
-                "name": examen.nombre_examen,
-                "sku": f"examen_{examen.id}",
-                "price": str(examen.precio_examen),
-                "currency": "USD",
-                "quantity": 1
-            })
-
-        payment = paypalrestsdk.Payment({
-            "intent": "sale",
-            "payer": {"payment_method": "paypal"},
-            "redirect_urls": {
-                "return_url": self.request.build_absolute_uri(reverse_lazy('attention:paypal_execute')),
-                "cancel_url": self.request.build_absolute_uri(reverse_lazy('attention:pago_list'))
-            },
-            "transactions": [{
-                "item_list": {"items": items},
-                "amount": {"total": str(total), "currency": "USD"},
-                "description": "Pago de atención médica"
-            }]
-        })
-
-        if payment.create():
-            for link in payment.links:
-                if link.rel == "approval_url":
-                    approval_url = str(link.href)
-                    break
-
-            self.request.session['servicios_adicionales'] = [s.id for s in form.cleaned_data['servicios_adicionales']]
-            self.request.session['examenes_medicos'] = [e.id for e in form.cleaned_data['examenes_medicos']]
-
-            return redirect(approval_url)
-        else:
-            messages.error(self.request, "Hubo un problema al procesar el pago con PayPal. Inténtalo de nuevo.")
-            return redirect(self.success_url)
-
+    
 def paypal_execute(request):
     payment_id = request.GET.get('paymentId')
     payer_id = request.GET.get('PayerID')
@@ -167,7 +112,7 @@ class PagoDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['total_pagado'] = self.object.calcular_total_pagado()
+        context['total_pagado'] = self.object.costo_atencion.total 
         return context
 
 class PagoDeleteView(LoginRequiredMixin, DeleteViewMixin, DeleteView):
@@ -176,13 +121,9 @@ class PagoDeleteView(LoginRequiredMixin, DeleteViewMixin, DeleteView):
     success_url = reverse_lazy('attention:pago_list')
 
     def delete(self, request, *args, **kwargs):
-        try:
-            with transaction.atomic():
-                self.object = self.get_object()
-                self.object.delete()
-            messages.success(request, "El pago ha sido eliminado correctamente.")
-        except Exception as e:
-            messages.error(request, f"Error al eliminar el pago: {e}")
+        self.object = self.get_object()
+        self.object.delete()
+        messages.success(request, "El pago ha sido eliminado correctamente.")
         return redirect(self.success_url)
 
 class PagoComprobanteView(View):
@@ -200,18 +141,21 @@ class PagoComprobanteView(View):
 
         response = HttpResponse(pdf.getvalue(), content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="comprobante_pago_{pago.pk}.pdf"'
+
         return response
 
 def verificar_pago_paciente(request):
     paciente_id = request.GET.get('paciente_id')
-    ha_pagado = Pago.objects.filter(paciente_id=paciente_id, pagado=True).exists()
+    # Ajusta la lógica según tu nuevo modelo
+    ha_pagado = Pago.objects.filter(paciente_id=paciente_id, pagado=True).exists()  
     return JsonResponse({'ha_pagado': ha_pagado})
 
 def obtener_examenes_paciente(request):
     paciente_id = request.GET.get('paciente_id')
     if not paciente_id:
         return JsonResponse({'error': 'El ID del paciente es obligatorio'}, status=400)
-
-    examenes = ExamenSolicitado.objects.filter(atencion__paciente_id=paciente_id, activo=True, pagado=False)
-    examenes_data = [{'id': examen.id, 'nombre': examen.nombre_examen, 'precio': str(examen.precio_examen)} for examen in examenes]
+    # Ajusta la lógica según tu nuevo modelo, 
+    # considerando la relación entre ExamenSolicitado y Atencion
+    examenes = ExamenSolicitado.objects.filter(atencion__paciente_id=paciente_id, estado='Pendiente') 
+    examenes_data = [{'id': examen.id, 'nombre': examen.nombre_examen, 'precio': str(examen.costo)} for examen in examenes]
     return JsonResponse({'examenes': examenes_data})

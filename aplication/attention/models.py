@@ -91,7 +91,7 @@ class Atencion(models.Model):
     # Detalle del examen físico realizado
     examen_fisico = models.TextField(null=True, blank=True, verbose_name="Examen Físico")
     # Detalle de  examenes a enviar
-    examenes_enviados = models.ManyToManyField('ExamenSolicitado', blank=True, verbose_name="Exámenes Enviados")
+    examenes_enviados = models.ManyToManyField('ExamenSolicitado', blank=True, verbose_name="Exámenes Enviados", related_name="atenciones_examenes") 
     # Comentarios adicionales del doctor sobre la atención o el estado del paciente
     comentario_adicional = models.TextField(null=True, blank=True, verbose_name="Comentario")
 
@@ -162,8 +162,11 @@ class ServiciosAdicionales(models.Model):
 class CostosAtencion(models.Model):
     # Relación con el modelo CabeceraAtencion, indica a qué atención médica pertenece el costo
     atencion = models.ForeignKey(Atencion, on_delete=models.PROTECT, verbose_name="Atención",related_name="costos_atencion")
+    # Costo de la consulta
+    costo_consulta = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Costo de la Consulta", default=10.00)   # Sin valor por defecto
+    descripcion = models.TextField(null=True, blank=True, verbose_name="Descripción de los Costos")  # Nuevo campo
     # Total de los costos calculado
-    total = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Total", default=0.00)
+    total = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Total", editable=False)
     # Fecha en que se registraron los costos
     fecha_pago = models.DateTimeField(auto_now_add=True, verbose_name="Fecha Pago")
     
@@ -171,6 +174,16 @@ class CostosAtencion(models.Model):
     
     def __str__(self):
         return f"{self.atencion} - Total: {self.total}"
+
+    def calcular_total(self):
+        """
+        Calcula el total de los costos, incluyendo la consulta, 
+        los servicios adicionales y los exámenes médicos.
+        """
+        total = self.costo_consulta
+        total += sum(detalle.costo_servicio for detalle in self.costos_atenciones.all())
+        total += sum(examen.costo for examen in self.atencion.examenes_solicitados.all())
+        self.total = total 
 
     class Meta:
         # Ordena los costos por fecha de registro
@@ -188,13 +201,11 @@ class CostoAtencionDetalle(models.Model):
     costo_servicio = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Costo del Servicio")
 
     def __str__(self):
-        return f"{self.servicios_adicionales} Costo: {self.costo_servicio}"
+        return f"{self.servicios_adicionales} - Costo: {self.servicios_adicionales.costo_servicio}"  # Obtener costo desde ServiciosAdicionales
 
     class Meta:
-         # Nombre singular y plural del modelo en la interfaz administrativa
         verbose_name = "Costo detalle Atención"
         verbose_name_plural = "Costos detalles Atención"
-
 class ExamenSolicitado(models.Model):
     # Nombre o tipo de examen solicitado (ej. Hemograma, Radiografía, etc.)
     nombre_examen = models.CharField(max_length=255, verbose_name="Nombre del Examen")
@@ -202,7 +213,7 @@ class ExamenSolicitado(models.Model):
     paciente = models.ForeignKey(Paciente, on_delete=models.PROTECT, verbose_name="Paciente",related_name="pacientes_examenes")
     # Fecha en la que se solicitó el examen
     fecha_solicitud = models.DateField(auto_now_add=True, verbose_name="Fecha de Solicitud")
-    
+    atencion = models.ForeignKey(Atencion, on_delete=models.PROTECT, verbose_name="Atención Médica", related_name="examenes_solicitados", null=True, blank=True)
     costo = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Costo del Examen")
     # Campo adicional: archivo para subir el resultado del examen (opcional)
     resultado = models.FileField(upload_to='resultados_examenes/', null=True, blank=True, verbose_name="Resultado del Examen")
@@ -244,39 +255,14 @@ class Certificado(models.Model):
 class Pago(models.Model):
     paciente = models.ForeignKey(Paciente, on_delete=models.PROTECT, verbose_name="Paciente")
     costo_atencion = models.OneToOneField(CostosAtencion, on_delete=models.PROTECT, verbose_name="Costo Atención")
-    servicios_adicionales = models.ManyToManyField(ServiciosAdicionales, blank=True, verbose_name="Servicios Adicionales")
-    examenes_medicos = models.ManyToManyField(ExamenSolicitado, blank=True, verbose_name="Examenes Solicitados")
     monto = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Monto")
-    metodo_pago = models.CharField(max_length=50, choices=[
-        ('Efectivo', 'Efectivo'), 
-        ('PayPal', 'PayPal')
-    ], verbose_name="Método de Pago")
+    metodo_pago = models.CharField(max_length=50, verbose_name="Método de Pago")  # Sin choices, para mayor flexibilidad
     pagado = models.BooleanField(default=False, verbose_name="Pagado")
     fecha_pago = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de Pago")
 
-    def __str__(self):  # Corregir el nombre del método
+    def __str__(self):
         return f"{self.paciente} - {self.costo_atencion} - {self.monto} - {self.metodo_pago}"
-    
-    def calcular_monto_total(self):
-        # Obtener el costo de atención
-        total = self.costo_atencion.costo if self.costo_atencion else 0
 
-        # Sumar los costos de los servicios adicionales
-        for servicio in self.servicios_adicionales.all():
-            total += servicio.costo
-
-        # Sumar los costos de los exámenes médicos
-        for examen in self.examenes_medicos.all():
-            total += examen.costo
-
-        return total
-    
-    def calcular_total(self, costo_atencion, servicios_adicionales, examenes_medicos):
-        total_servicios = sum(servicio.costo_servicio for servicio in servicios_adicionales)
-        total_examenes = sum(examen.precio_examen for examen in examenes_medicos)
-        return costo_atencion.total + total_servicios + total_examenes
-
-    def save(self, *args, **kwargs):
-        # Calcular el monto total automáticamente antes de guardar
-        self.monto = self.calcular_monto_total()
-        super().save(*args, **kwargs)
+    class Meta:
+        verbose_name = "Pago"
+        verbose_name_plural = "Pagos"

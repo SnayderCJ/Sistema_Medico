@@ -6,6 +6,9 @@ from aplication.attention.models import (
     DetalleAtencion,
     ServiciosAdicionales,
     CostosAtencion,
+    CostoAtencionDetalle,
+    ExamenSolicitado,
+    Pago,
 )
 
 # Admin para HorarioAtencion
@@ -45,10 +48,22 @@ class ServiciosAdicionalesAdmin(admin.ModelAdmin):
     list_display = ('nombre_servicio', 'costo_servicio')
     search_fields = ('nombre_servicio',)
 
-# Admin para CostosAtencion
-@admin.register(CostosAtencion)
-class CostosAtencionAdmin(admin.ModelAdmin):
-    list_display = ('atencion', 'total', 'fecha_pago')
-    search_fields = ('atencion__paciente__nombre',)
+# Admin para CostoAtencionDetalle
+@admin.register(CostoAtencionDetalle)
+class CostoAtencionDetalleAdmin(admin.ModelAdmin):
+    list_display = ('costo_atencion', 'servicios_adicionales')  # Elimina 'costo_servicio'
+    search_fields = ('costo_atencion__atencion__paciente__nombre', 'servicios_adicionales__nombre_servicio')
 
+# Admin para ExamenSolicitado
+@admin.register(ExamenSolicitado)
+class ExamenSolicitadoAdmin(admin.ModelAdmin):
+    list_display = ('nombre_examen', 'paciente', 'atencion', 'fecha_solicitud', 'costo', 'estado')  # Agrega 'atencion'
+    search_fields = ('nombre_examen', 'paciente__nombre', 'atencion__paciente__nombre')
+    list_filter = ('estado', 'fecha_solicitud')
 
+# Admin para Pago
+@admin.register(Pago)
+class PagoAdmin(admin.ModelAdmin):
+    list_display = ('paciente', 'costo_atencion', 'monto', 'metodo_pago', 'pagado', 'fecha_pago')
+    search_fields = ('paciente__nombre', 'costo_atencion__atencion__paciente__nombre')
+    list_filter = ('metodo_pago', 'pagado', 'fecha_pago')
