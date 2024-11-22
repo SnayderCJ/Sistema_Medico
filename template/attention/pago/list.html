@@ -62,6 +62,11 @@
                                             <button type="button" class="btn btn-danger btn-sm" title="Eliminar Pago" onclick="confirmDelete('{{ pago.id }}', '{{ pago.paciente.nombre_completo }}')">
                                                 <i class="fas fa-trash-alt"></i>
                                             </button>
+                                            {% if not pago.pagado %}
+                                            <a href="{% url 'attention:paypal_execute' %}?paymentId={{ pago.id }}" class="btn btn-primary btn-sm" title="Pagar con PayPal">
+                                                <i class="fab fa-paypal"></i> Pagar con PayPal
+                                            </a>
+                                            {% endif %}
                                         </div>
                                     </td>
                                 </tr>

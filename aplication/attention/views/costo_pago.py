@@ -109,7 +109,7 @@ class PagoCreateView(LoginRequiredMixin, CreateView):
         items = [{
             "name": "Pago Médico",
             "sku": "001",
-            "price": str(total),
+            "price": f"{total:.2f}",
             "currency": "USD",
             "quantity": 1
         }]
@@ -123,14 +123,18 @@ class PagoCreateView(LoginRequiredMixin, CreateView):
             },
             "transactions": [{
                 "item_list": {"items": items},
-                "amount": {"total": str(total), "currency": "USD"},
+                "amount": {"total": f"{total:.2f}", "currency": "USD"},
                 "description": "Pago de servicios médicos"
             }]
         })
 
         if payment.create():
-            return redirect(next(link.href for link in payment.links if link.rel == "approval_url"))
-        messages.error(self.request, "Hubo un problema al procesar el pago con PayPal.")
+            approval_url = next((link.href for link in payment.links if link.rel == "approval_url"), None)
+            if approval_url:
+                return redirect(approval_url)
+
+        error_msg = payment.error.get('message', 'Error desconocido') if payment.error else 'Error al crear el pago'
+        messages.error(self.request, f"Hubo un problema al procesar el pago con PayPal: {error_msg}")
         return redirect(self.success_url)
 
 # Editar un pago
@@ -304,12 +308,19 @@ def paypal_execute(request):
     payment_id = request.GET.get('paymentId')
     payer_id = request.GET.get('PayerID')
 
+    if not payment_id or not payer_id:
+        messages.error(request, "Datos insuficientes para completar el pago con PayPal.")
+        return redirect('attention:pago_list')
+
     try:
         payment = paypalrestsdk.Payment.find(payment_id)
         if payment.execute({"payer_id": payer_id}):
+            # Aquí puedes actualizar el estado del pago en tu modelo Pago
+            Pago.objects.filter(payment_id=payment_id).update(pagado=True)
             messages.success(request, "El pago con PayPal se ha procesado correctamente.")
             return redirect('attention:pago_list')
-        raise Exception(payment.error)
+        else:
+            raise Exception(payment.error)
     except Exception as e:
         messages.error(request, f"Error en PayPal: {e}")
         return redirect('attention:pago_list')
