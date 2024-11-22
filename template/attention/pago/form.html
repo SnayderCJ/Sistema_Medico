@@ -69,7 +69,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-floating">
-                                    <input type="text" id="total_a_pagar" class="form-control" readonly>
+                                    <input type="text" id="total_a_pagar" class="form-control" readonly value="{{ total_a_pagar|default:'' }}">
                                     <label for="total_a_pagar">Total a Pagar</label>
                                 </div>
                             </div>
@@ -87,7 +87,7 @@
                         <div class="row g-4 mb-2">
                             <div class="col-md-12">
                                 <div class="form-floating">
-                                    {{ form.costos }}
+                                    <textarea id="{{ form.costos.id_for_label }}" class="form-control" readonly>{{ costos_detallados|default:'' }}</textarea>
                                     <label for="{{ form.costos.id_for_label }}">{{ form.costos.label }}</label>
                                 </div>
                             </div>

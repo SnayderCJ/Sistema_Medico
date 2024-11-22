@@ -78,11 +78,11 @@ class CostosAtencion(models.Model):
         """
         Calcula el total basado en los servicios adicionales, exámenes y medicamentos relacionados.
         """
-        total = Decimal(self.costo_consulta)  # Asegurarse de que `total` sea un Decimal
+        total = Decimal(self.costo_consulta)
         if self.pk:  # Solo calcular si la instancia tiene clave primaria
             total += sum(Decimal(servicio.costo_servicio) for servicio in self.servicios.all())
-            total += sum(Decimal(examen.costo) for examen in self.atencion.examenes.all())
-            total += sum(Decimal(detalle.medicamento.precio) * Decimal(detalle.cantidad)for detalle in self.atencion.detalles.all())
+            total += sum(Decimal(detalle.calcular_costo_examen()) for detalle in self.atencion.detalles.all())
+            total += sum(Decimal(detalle.medicamento.precio) * Decimal(detalle.cantidad) for detalle in self.atencion.detalles.all())
         return total
 
     def save(self, *args, **kwargs):
@@ -106,8 +106,7 @@ class ServiciosAdicionales(models.Model):
         CostosAtencion,
         on_delete=models.CASCADE,
         verbose_name="Costo Atención",
-        related_name="servicios",
-        default=1
+        related_name="servicios"
     )
 
     def __str__(self):
@@ -157,9 +156,26 @@ class ExamenSolicitado(models.Model):
 class DetalleAtencion(models.Model):
     atencion = models.ForeignKey('Atencion', on_delete=models.CASCADE, verbose_name="Atención", related_name="detalles")
     medicamento = models.ForeignKey(Medicamento, on_delete=models.CASCADE, verbose_name="Medicamento", related_name="detalles_atencion")
+    examen_solicitado = models.ForeignKey(
+        ExamenSolicitado, on_delete=models.CASCADE, verbose_name="Examen Solicitado", related_name="detalles_atencion", null=True, blank=True
+    )
     cantidad = models.PositiveIntegerField(verbose_name="Cantidad")
     prescripcion = models.TextField(verbose_name="Prescripción")
     duracion_tratamiento = models.PositiveIntegerField(verbose_name="Duración del Tratamiento (días)", null=True, blank=True)
+
+    def calcular_costo_examen(self):
+        """
+        Calcula el costo del examen asociado, si lo hay.
+        """
+        if self.examen_solicitado:
+            return self.examen_solicitado.costo
+        return Decimal(0)
+
+    def save(self, *args, **kwargs):
+        # Validar que el examen esté asociado al paciente correcto
+        if self.examen_solicitado and self.atencion.paciente != self.examen_solicitado.paciente:
+            raise IntegrityError("El examen solicitado no pertenece al paciente de esta atención.")
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Detalle de {self.medicamento} para {self.atencion}"
@@ -168,6 +184,7 @@ class DetalleAtencion(models.Model):
         ordering = ['atencion']
         verbose_name = "Detalle de Atención"
         verbose_name_plural = "Detalles de Atención"
+
 
 
 # Modelo que representa la cabecera de una atención médica.

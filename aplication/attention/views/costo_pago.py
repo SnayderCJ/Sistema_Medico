@@ -152,7 +152,12 @@ class PagoUpdateView(LoginRequiredMixin, UpdateView):
         examenes = ExamenSolicitado.objects.filter(atencion__paciente_id=paciente_id)
         total_examenes = examenes.aggregate(Sum('costo'))['costo__sum'] or 0
 
-        return total_costos_atencion + total_servicios_adicionales + total_examenes
+        medicinas = DetalleAtencion.objects.filter(atencion__paciente_id=paciente_id)
+        total_medicinas = sum(
+            detalle.medicamento.precio * detalle.cantidad for detalle in medicinas
+        )
+
+        return total_costos_atencion + total_servicios_adicionales + total_examenes + total_medicinas
 
     def validar_costo_atencion(self, atencion):
         if not CostosAtencion.objects.filter(atencion=atencion).exists():
@@ -162,6 +167,39 @@ class PagoUpdateView(LoginRequiredMixin, UpdateView):
                 descripcion="Consulta médica general",
                 activo=True
             )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        paciente_id = self.object.paciente.id
+        total_costos = self.obtener_costos_completos_paciente(paciente_id)
+        context['total_a_pagar'] = total_costos
+        context['costos_detallados'] = self.obtener_costos_detallados(paciente_id)
+        return context
+
+    def obtener_costos_detallados(self, paciente_id):
+        costos_atencion = CostosAtencion.objects.filter(atencion__paciente_id=paciente_id, activo=True)
+        total_costos_atencion = costos_atencion.aggregate(Sum('total'))['total__sum'] or 0
+
+        servicios_adicionales = ServiciosAdicionales.objects.filter(
+            costo_atencion__atencion__paciente_id=paciente_id
+        )
+        total_servicios_adicionales = servicios_adicionales.aggregate(Sum('costo_servicio'))['costo_servicio__sum'] or 0
+
+        examenes = ExamenSolicitado.objects.filter(atencion__paciente_id=paciente_id)
+        total_examenes = examenes.aggregate(Sum('costo'))['costo__sum'] or 0
+
+        medicinas = DetalleAtencion.objects.filter(atencion__paciente_id=paciente_id)
+        total_medicinas = sum(
+            detalle.medicamento.precio * detalle.cantidad for detalle in medicinas
+        )
+
+        detalles = f"Costos Atención: ${total_costos_atencion:.2f}\n"
+        detalles += f"Servicios Adicionales: ${total_servicios_adicionales:.2f}\n"
+        detalles += f"Exámenes: ${total_examenes:.2f}\n"
+        detalles += f"Medicinas: ${total_medicinas:.2f}\n\n"
+        detalles += f"Total General: ${total_costos_atencion + total_servicios_adicionales + total_examenes + total_medicinas:.2f}"
+
+        return detalles
 
     def form_valid(self, form):
         paciente = form.cleaned_data['paciente']
@@ -320,35 +358,27 @@ def obtener_costos_completos_paciente(request):
 
     # Calcular costos de atención
     costos_atencion = CostosAtencion.objects.filter(atencion__paciente_id=paciente_id, activo=True)
-    print(f"Costos de atención encontrados: {costos_atencion}")
     total_costos_atencion = costos_atencion.aggregate(Sum('total'))['total__sum'] or 0
-    print(f"Total de costos de atención: {total_costos_atencion}")
 
     # Calcular costos de servicios adicionales
     servicios_adicionales = ServiciosAdicionales.objects.filter(
         costo_atencion__atencion__paciente_id=paciente_id
     )
-    print(f"Servicios adicionales encontrados: {servicios_adicionales}")
     total_servicios_adicionales = servicios_adicionales.aggregate(Sum('costo_servicio'))['costo_servicio__sum'] or 0
-    print(f"Total de servicios adicionales: {total_servicios_adicionales}")
 
     # Calcular costos de exámenes
     examenes = ExamenSolicitado.objects.filter(atencion__paciente_id=paciente_id)
-    print(f"Exámenes encontrados: {examenes}")
+    print(examenes)
     total_examenes = examenes.aggregate(Sum('costo'))['costo__sum'] or 0
-    print(f"Total de exámenes: {total_examenes}")
 
     # Calcular costos de medicinas
     medicinas = DetalleAtencion.objects.filter(atencion__paciente_id=paciente_id)
-    print(f"Medicinas encontradas: {medicinas}")
     total_medicinas = sum(
         detalle.medicamento.precio * detalle.cantidad for detalle in medicinas
     )
-    print(f"Total de medicinas: {total_medicinas}")
 
     # Total general
     total_general = total_costos_atencion + total_servicios_adicionales + total_examenes + total_medicinas
-    print(f"Total general: {total_general}")
 
     # Devolver la respuesta JSON con los costos
     return JsonResponse({
