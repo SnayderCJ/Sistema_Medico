@@ -18,9 +18,15 @@
         <!-- Sidebar -->
         <div class="col-md-3 col-lg-2 px-0 sidebar">
             <div class="text-center py-1">
-                <div class="d-flex flex-row justify-content-center align-items-center text-center">
-                    <img src="{% static 'img/usuario_anonimo.png' %}" alt="Logo" class="mb-3 rounded-circle" width="100px">
-                </div>
+                {% if request.user.is_authenticated %}
+                    <div class="d-flex flex-row justify-content-center align-items-center text-center">
+                        <img src="{{ user.get_image }}" alt="Logo" class="mb-3 rounded-circle" width="100px">
+                    </div>
+                {% else %}
+                    <div class="d-flex flex-row justify-content-center align-items-center text-center">
+                        <img src="{% static 'img/usuario_anonimo.png' %}" alt="Logo" class="mb-3 rounded-circle" width="100px">
+                    </div>
+                {% endif %}
                 <h5 class="text-white">{{request.user}}</h5>
             </div>
             <nav class="nav flex-column mt-4">
@@ -65,6 +71,7 @@
                         <i class="fas fa-home"></i> <!-- o cualquier otro icono de Font Awesome -->
                         {{title}}
                     </a>
+                {% if request.user.is_authenticated %}
                     <div class="d-flex align-items-center">
                         <div class="dropdown">
                             <button class="btn btn-link dropdown-toggle text-white" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown">
@@ -79,10 +86,16 @@
                                         <i class="fas fa-sign-out-alt me-2"></i>Salir
                                       </button>
                                     </form>
-                                  </li>
+                                </li>
                             </ul>
                         </div>
                     </div>
+                {% else %}
+                    <div class="d-flex align-items-center">
+                        <a class="btn btn-primary me-2" href="{% url 'security:auth_login' %}">Login</a>
+                        <a class="btn btn-secondary" href="{% url 'security:auth_signup' %}">Register</a>
+                    </div>
+                {% endif %}
                 </div>
             </nav>
             
@@ -130,7 +143,7 @@
                             </div>
                             <div>
                                 <h6 class="card-title mb-0">Atenciones</h6>
-                                <h3 class="mb-0">80</h3>
+                                <h3 class="mb-0">{{can_atenciones}}</h3>
                             </div>
                         </div>
                     </div>

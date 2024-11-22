@@ -3,7 +3,7 @@ from django.views import View
 from datetime import date, timedelta
 from django.views.generic import TemplateView
 from aplication.core.models import Paciente
-from aplication.attention.models import CitaMedica
+from aplication.attention.models import CitaMedica, Atencion
 
 class HomeTemplateView(TemplateView):
     template_name = 'core/home.html'
@@ -19,6 +19,7 @@ class HomeTemplateView(TemplateView):
         context["proximas_citas"] = CitaMedica.objects.filter(fecha=date.today(), estado='P').order_by('hora_cita')
         context["ultima_cita_completada"] = CitaMedica.objects.filter(estado='R').order_by('-fecha', '-hora_cita').first()
         context["ultima_cita"] = CitaMedica.objects.order_by('-fecha', '-hora_cita').first()
+        context["can_atenciones"] = Atencion.cantidad_atenciones()
         return context
 
 

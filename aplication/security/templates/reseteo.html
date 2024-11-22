@@ -1,5 +1,11 @@
 {% extends 'components/base.html' %}
 
+{% load static %}
+{% block css%}
+    <link rel="stylesheet" href={% static 'css/form.css' %}>
+    <script src="https://cdn.tailwindcss.com"></script>
+{% endblock %}
+
 {% block content %}
 <div class="container mt-5">
     <h2 class="text-center">Cambiar Contraseña</h2>

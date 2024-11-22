@@ -211,6 +211,10 @@ class Atencion(models.Model):
     def get_diagnosticos(self):
         return " - ".join([c.descripcion for c in self.diagnostico.all().order_by('descripcion')])
     
+    @staticmethod
+    def cantidad_atenciones():
+       return Atencion.objects.all().count()
+    
     @property
     def calcular_imc(self):
         if self.peso and self.altura and self.altura > 0:
