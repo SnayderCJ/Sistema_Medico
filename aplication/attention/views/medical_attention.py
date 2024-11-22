@@ -156,13 +156,13 @@ class AttentionUpdateView(LoginRequiredMixin,UpdateViewMixin,UpdateView):
             messages.error(self.request, "Érro al actualizar la atención médica")
             return JsonResponse({"msg": str(ex)}, status=400)
         
-class AttentionDetailView(LoginRequiredMixin,DetailView):
+class AttentionDetailView(LoginRequiredMixin, DetailView):
     model = Atencion
-    
-    def get(self):
-        atencion = self.get_object()
-        detail_atencion =list(DetalleAtencion.objects.filter(atencion_id=atencion.id).values("medicamento_id","medicamento__nombre","cantidad","prescripcion"))
-        detail_atencion=json.dumps(detail_atencion,default=custom_serializer)
+
+    def get(self, request, *args, **kwargs):
+        atencion = self.get_object()  
+        detail_atencion = list(DetalleAtencion.objects.filter(atencion_id=atencion.id).values("medicamento_id", "medicamento__nombre", "cantidad", "prescripcion"))
+        detail_atencion = json.dumps(detail_atencion, default=custom_serializer)
         data = {
             'id': atencion.id,
             'nombres': atencion.paciente.nombre_completo,

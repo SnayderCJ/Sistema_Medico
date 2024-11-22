@@ -7,7 +7,6 @@ from django.http import JsonResponse
 from django.contrib import messages
 from django.db.models import Q
 from doctor.mixins import CreateViewMixin, DeleteViewMixin, ListViewMixin, UpdateViewMixin
-from django.shortcuts import render, get_object_or_404
 from doctor.utils import save_audit
 
 class PatientListView(LoginRequiredMixin,ListViewMixin,ListView):
@@ -119,15 +118,12 @@ class PatientDetailView(LoginRequiredMixin,DetailView):
             'apellidos': pacient.apellidos,
             'foto': pacient.get_image(),
             'fecha_nac': pacient.fecha_nacimiento,
-            'edad': pacient.calcular_edad(pacient.fecha_nacimiento),
+            'edad': pacient.calcular_edad(),
             'dni': pacient.cedula,
             'telefono': pacient.telefono,
             'direccion': pacient.direccion,
             'latitud': pacient.latitud,
             'longitud': pacient.longitud,
-            
-            
-            # Añade más campos según tu modelo
         }
         return JsonResponse(data)
     
