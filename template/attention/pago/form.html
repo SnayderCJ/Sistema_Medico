@@ -56,7 +56,7 @@
             
             <div class="card shadow">
                 <div class="card-body p-2 p-md-3">
-                    <form id="frmPago" method="POST">
+                    <form id="frmPago" method="POST" action="{% url 'attention:pago_create' %}">
                         {% csrf_token %}
                         {{ form.media }}
                         
@@ -69,8 +69,8 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-floating">
-                                    {{ form.costo_atencion }}
-                                    <label for="{{ form.costo_atencion.id_for_label }}">{{ form.costo_atencion.label }}</label>
+                                    <input type="text" id="total_a_pagar" class="form-control" readonly>
+                                    <label for="total_a_pagar">Total a Pagar</label>
                                 </div>
                             </div>
                         </div>
@@ -110,6 +110,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         const pacienteSelect = document.getElementById('{{ form.paciente.id_for_label }}');
         const costosTextarea = document.getElementById('{{ form.costos.id_for_label }}');
+        const totalAPagarInput = document.getElementById('total_a_pagar');
     
         pacienteSelect.addEventListener('change', function() {
             const pacienteId = this.value;
@@ -119,6 +120,7 @@
                     .then(data => {
                         if (data.error) {
                             costosTextarea.value = data.error;
+                            totalAPagarInput.value = '';
                         } else {
                             let detalles = '';
                             detalles += `Costos Atención: $${parseFloat(data.costos_atencion).toFixed(2)}\n`;
@@ -127,14 +129,17 @@
                             detalles += `Medicinas: $${parseFloat(data.medicinas).toFixed(2)}\n\n`;
                             detalles += `Total General: $${parseFloat(data.total_general).toFixed(2)}`;
                             costosTextarea.value = detalles;
+                            totalAPagarInput.value = `$${parseFloat(data.total_general).toFixed(2)}`;
                         }
                     })
                     .catch(error => {
                         console.error('Error al obtener los costos:', error);
                         costosTextarea.value = 'Error al obtener los costos';
+                        totalAPagarInput.value = '';
                     });
             } else {
                 costosTextarea.value = '';
+                totalAPagarInput.value = '';
             }
         });
     });

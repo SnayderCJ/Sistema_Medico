@@ -1,5 +1,5 @@
 from django import forms
-from aplication.attention.models import Pago, CostosAtencion
+from aplication.attention.models import Pago
 
 class PagoForm(forms.ModelForm):
     class Meta:

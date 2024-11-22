@@ -1,7 +1,7 @@
 from django.shortcuts import redirect, get_object_or_404
 from django.http import JsonResponse, HttpResponse
 from django.template.loader import get_template
-from django.views.generic import CreateView, ListView, DetailView, DeleteView, View
+from django.views.generic import CreateView, ListView, UpdateView, DeleteView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.db.models import Sum
@@ -48,37 +48,33 @@ class PagoCreateView(LoginRequiredMixin, CreateView):
         total_costos_atencion = costos_atencion.aggregate(Sum('total'))['total__sum'] or 0
 
         servicios_adicionales = ServiciosAdicionales.objects.filter(
-            costos_atenciones__costo_atencion__atencion__paciente_id=paciente_id
+            costo_atencion__atencion__paciente_id=paciente_id
         )
         total_servicios_adicionales = servicios_adicionales.aggregate(Sum('costo_servicio'))['costo_servicio__sum'] or 0
 
-        examenes = ExamenSolicitado.objects.filter(paciente_id=paciente_id)
+        examenes = ExamenSolicitado.objects.filter(atencion__paciente_id=paciente_id)
         total_examenes = examenes.aggregate(Sum('costo'))['costo__sum'] or 0
 
         return total_costos_atencion + total_servicios_adicionales + total_examenes
 
     def validar_costo_atencion(self, atencion):
-        """
-        Verifica si ya existe un registro de CostosAtencion para una atención dada.
-        Si no existe, lo crea.
-        """
         if not CostosAtencion.objects.filter(atencion=atencion).exists():
             CostosAtencion.objects.create(
                 atencion=atencion,
-                costo_consulta=10.00,  # Valor por defecto
+                costo_consulta=10.00,
                 descripcion="Consulta médica general",
                 activo=True
             )
 
     def form_valid(self, form):
         paciente = form.cleaned_data['paciente']
-        atencion = paciente.doctores_atencion.first()  # Asume que el paciente tiene una atención asociada.
+        atencion = paciente.doctores_atencion.first()
 
         if not atencion:
             messages.error(self.request, "El paciente no tiene atenciones asociadas.")
             return redirect(self.success_url)
 
-        self.validar_costo_atencion(atencion)  # Valida o crea el costo de atención.
+        self.validar_costo_atencion(atencion)
 
         total_costos = self.obtener_costos_completos_paciente(paciente.id)
 
@@ -87,6 +83,14 @@ class PagoCreateView(LoginRequiredMixin, CreateView):
             return redirect(self.success_url)
 
         metodo_pago = form.cleaned_data['metodo_pago']
+        costo_atencion = CostosAtencion.objects.filter(atencion=atencion, activo=True).first()
+
+        if not costo_atencion:
+            messages.error(self.request, "No se pudo encontrar el costo de atención.")
+            return redirect(self.success_url)
+
+        form.instance.costo_atencion = costo_atencion
+
         if metodo_pago == 'PayPal':
             return self.process_paypal_payment(form, total_costos)
         return self.process_cash_payment(form)
@@ -94,6 +98,7 @@ class PagoCreateView(LoginRequiredMixin, CreateView):
     def process_cash_payment(self, form):
         try:
             with transaction.atomic():
+                form.instance.monto = self.obtener_costos_completos_paciente(form.cleaned_data['paciente'].id)
                 form.save()
             messages.success(self.request, "El pago en efectivo se ha registrado correctamente.")
         except Exception as e:
@@ -128,17 +133,114 @@ class PagoCreateView(LoginRequiredMixin, CreateView):
         messages.error(self.request, "Hubo un problema al procesar el pago con PayPal.")
         return redirect(self.success_url)
 
-
-# Detalle de un pago
-class PagoDetailView(LoginRequiredMixin, DetailView):
+# Editar un pago
+class PagoUpdateView(LoginRequiredMixin, UpdateView):
     model = Pago
-    template_name = 'attention/pago/detail.html'
-    context_object_name = 'pago'
+    template_name = 'attention/pago/form.html'
+    form_class = PagoForm
+    success_url = reverse_lazy('attention:pago_list')
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['total_pagado'] = self.object.monto
-        return context
+    def obtener_costos_completos_paciente(self, paciente_id):
+        costos_atencion = CostosAtencion.objects.filter(atencion__paciente_id=paciente_id, activo=True)
+        total_costos_atencion = costos_atencion.aggregate(Sum('total'))['total__sum'] or 0
+
+        servicios_adicionales = ServiciosAdicionales.objects.filter(
+            costo_atencion__atencion__paciente_id=paciente_id
+        )
+        total_servicios_adicionales = servicios_adicionales.aggregate(Sum('costo_servicio'))['costo_servicio__sum'] or 0
+
+        examenes = ExamenSolicitado.objects.filter(atencion__paciente_id=paciente_id)
+        total_examenes = examenes.aggregate(Sum('costo'))['costo__sum'] or 0
+
+        return total_costos_atencion + total_servicios_adicionales + total_examenes
+
+    def validar_costo_atencion(self, atencion):
+        if not CostosAtencion.objects.filter(atencion=atencion).exists():
+            CostosAtencion.objects.create(
+                atencion=atencion,
+                costo_consulta=10.00,
+                descripcion="Consulta médica general",
+                activo=True
+            )
+
+    def form_valid(self, form):
+        paciente = form.cleaned_data['paciente']
+        atencion = paciente.doctores_atencion.first()
+
+        if not atencion:
+            messages.error(self.request, "El paciente no tiene atenciones asociadas.")
+            return redirect(self.success_url)
+
+        self.validar_costo_atencion(atencion)
+
+        total_costos = self.obtener_costos_completos_paciente(paciente.id)
+
+        if total_costos == 0:
+            messages.warning(self.request, "No hay costos pendientes para este paciente.")
+            return redirect(self.success_url)
+
+        metodo_pago = form.cleaned_data['metodo_pago']
+        costo_atencion = CostosAtencion.objects.filter(atencion=atencion, activo=True).first()
+
+        if not costo_atencion:
+            messages.error(self.request, "No se pudo encontrar el costo de atención.")
+            return redirect(self.success_url)
+
+        form.instance.costo_atencion = costo_atencion
+
+        if metodo_pago == 'PayPal':
+            return self.process_paypal_payment(form, total_costos)
+        return self.process_cash_payment(form)
+
+    def process_cash_payment(self, form):
+        try:
+            with transaction.atomic():
+                form.instance.monto = self.obtener_costos_completos_paciente(form.cleaned_data['paciente'].id)
+                form.save()
+            messages.success(self.request, "El pago en efectivo se ha registrado correctamente.")
+        except Exception as e:
+            messages.error(self.request, f"Error al registrar el pago: {e}")
+        return redirect(self.success_url)
+
+    def process_paypal_payment(self, form, total):
+        items = [{
+            "name": "Pago Médico",
+            "sku": "001",
+            "price": str(total),
+            "currency": "USD",
+            "quantity": 1
+        }]
+
+        payment = paypalrestsdk.Payment({
+            "intent": "sale",
+            "payer": {"payment_method": "paypal"},
+            "redirect_urls": {
+                "return_url": self.request.build_absolute_uri(reverse_lazy('attention:paypal_execute')),
+                "cancel_url": self.request.build_absolute_uri(reverse_lazy('attention:pago_list'))
+            },
+            "transactions": [{
+                "item_list": {"items": items},
+                "amount": {"total": str(total), "currency": "USD"},
+                "description": "Pago de servicios médicos"
+            }]
+        })
+
+        if payment.create():
+            return redirect(next(link.href for link in payment.links if link.rel == "approval_url"))
+        messages.error(self.request, "Hubo un problema al procesar el pago con PayPal.")
+        return redirect(self.success_url)
+
+# Eliminar un pago
+class PagoDeleteView(LoginRequiredMixin, DeleteView):
+    model = Pago
+    template_name = 'attention/pago/confirm_delete.html'
+    success_url = reverse_lazy('attention:pago_list')
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.delete()
+        messages.success(request, "El pago ha sido eliminado correctamente.")
+        return redirect(self.success_url)
 
 # Comprobante de pago (PDF)
 class PagoComprobanteView(View):
@@ -156,18 +258,6 @@ class PagoComprobanteView(View):
         response['Content-Disposition'] = f'attachment; filename="comprobante_pago_{pago.pk}.pdf"'
 
         return response
-
-# Eliminar un pago
-class PagoDeleteView(LoginRequiredMixin, DeleteView):
-    model = Pago
-    template_name = 'attention/pago/confirm_delete.html'
-    success_url = reverse_lazy('attention:pago_list')
-
-    def delete(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        self.object.delete()
-        messages.success(request, "El pago ha sido eliminado correctamente.")
-        return redirect(self.success_url)
 
 ### FUNCIONES (API JSON RESPONSES) ###
 
