@@ -4,6 +4,9 @@ from datetime import date, timedelta
 from django.views.generic import TemplateView
 from aplication.core.models import Paciente
 from aplication.attention.models import CitaMedica, Atencion
+from django.utils import timezone
+from django.db.models import Sum
+from aplication.attention.models import Pago  # Adjust the import path as necessary
 
 class HomeTemplateView(TemplateView):
     template_name = 'core/home.html'
@@ -20,6 +23,12 @@ class HomeTemplateView(TemplateView):
         context["ultima_cita_completada"] = CitaMedica.objects.filter(estado='R').order_by('-fecha', '-hora_cita').first()
         context["ultima_cita"] = CitaMedica.objects.order_by('-fecha', '-hora_cita').first()
         context["can_atenciones"] = Atencion.cantidad_atenciones()
+        
+        # Calcular pagos de hoy
+        hoy = timezone.now().date()
+        pagos_hoy = Pago.objects.filter(fecha_pago__date=hoy, pagado=True).aggregate(total=Sum('monto'))['total'] or 0
+        context["pagos_hoy"] = pagos_hoy
+        
         return context
 
 
@@ -38,3 +47,4 @@ class ChartDataView(View):
             "labels": labels[::-1],  # Invertir el orden para mostrar cronológicamente
             "data": data[::-1]
         })
+
